@@ -48,7 +48,7 @@ public class Robot extends IterativeRobot {
 	
 	//PIDConstants
 	//Claw
-	public static final double clawPIDP = 0.01;
+	public static final double clawPIDP = 0.7;
 	public static final double clawPIDI = 0;
 	public static final double clawPIDD = 0;
 	
@@ -197,7 +197,12 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		driveStateMachine(currentDriveState);
 		driverControls();
-		clawStateMachine(currentClawState);
+		//clawStateMachine(currentClawState);
+		smartDashboard();
+	}
+	
+	@Override
+	public void disabledPeriodic(){
 		smartDashboard();
 	}
 	
@@ -224,8 +229,12 @@ public class Robot extends IterativeRobot {
 	public void clawInit(){
 		clawGrabber = new DoubleSolenoid(PCM, CLAWEXTEND, CLAWRETRACT);
 		clawPivot = new CANTalon(CLAWPIVOTMOTOR);
-		clawPivot.changeControlMode(TalonControlMode.Position);
 		clawPivot.setPID(clawPIDP, clawPIDI, clawPIDD);
+		clawPivot.configMaxOutputVoltage(5);
+		clawPivot.setAllowableClosedLoopErr(200);
+		//clawPivot.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
+		clawPivot.setEncPosition(clawPivot.getPulseWidthPosition());
+		clawPivot.reverseOutput(true);
 	}
 	public void climberInit(){
 		climber = new VictorSP(CLIMBERMOTOR);
@@ -292,22 +301,22 @@ public class Robot extends IterativeRobot {
 			shiftDown();
 		}
 		if(driverGamePad.getRawButton(CLAWUPANDEXTENDBTN)){
-			currentClawState = ClawStates.UPANDEXTENDED;
+			clawDown();
 		}
 		if(driverGamePad.getRawButton(CLAWUPANDRETRACTBTN)){
-			currentClawState = ClawStates.UPANDRETRACTED;
+			clawUp();
 		}
 		if(driverGamePad.getRawButton(CLIMBFASTBTN)){
-			climbFast();
+			clawMiddle();;
 		}
 		if(driverGamePad.getRawButton(CLIMBSLOWBTN)){
 			climbSlow();
 		}
 		if(driverGamePad.getRawButton(CLAWDOWNANDEXTENDBTN)){
-			currentClawState = ClawStates.DOWNANDEXTENDED;
+			clawExtend();
 		}
 		if(driverGamePad.getRawButton(CLAWDOWNANDRETRACTBTN)){
-			currentClawState = ClawStates.DOWNANDRETRACTED;
+			clawRetract();
 		}
 	}
 	
@@ -323,24 +332,34 @@ public class Robot extends IterativeRobot {
 	}
 	public void clawDown(){
 		//Enc PW Pos of 1920
-		clawPivot.set(1920);
+		clawPivot.changeControlMode(TalonControlMode.Position);
+		
+		clawPivot.set(4000);
 		
 	}
 	public void clawUp(){
 		//Enc PW Pos of 890
-		clawPivot.set(890);
+		clawPivot.changeControlMode(TalonControlMode.Position);
+		clawPivot.set(3000);
 	}
 	public void climbSlow(){
 		climber.set(0.2);
 	}
 	public void climbFast(){
-		climber.set(0.5);
+		climber.set(0);
+	}
+	public void clawMiddle(){
+		clawPivot.changeControlMode(TalonControlMode.Position);
+		clawPivot.set(3870);
 	}
 	
 
 	public void smartDashboard(){
 		if(DEBUG){
 			SmartDashboard.putNumber("Claw Encoder", clawPivot.getPulseWidthPosition());
+			SmartDashboard.putNumber("Claw Encoder 2", clawPivot.getEncPosition());
+			
+
 			SmartDashboard.putString("Auto Mode", autoModes[autoMode]);
 		}else {
 			
