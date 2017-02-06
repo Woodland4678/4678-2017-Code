@@ -18,6 +18,14 @@ import com.ctre.CANTalon.TalonControlMode;
  * directory.
  */
 
+/**
+ * TODO
+ * - Classes
+ * - Controls for Gear simplified
+ * 
+ *
+ */
+ 
 
 
 public class Robot extends IterativeRobot {
@@ -39,8 +47,6 @@ public class Robot extends IterativeRobot {
 	public static final int CLAWEXTEND = 3;
 	
 	public static final boolean DEBUG = true;
-	
-	//CANTalon
 	
 	//Controllers
 	public static final int DRIVERGAMEPAD = 0;
