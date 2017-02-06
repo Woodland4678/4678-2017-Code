@@ -22,7 +22,8 @@ import com.ctre.CANTalon.TalonControlMode;
  * TODO
  * - Classes
  * - Controls for Gear simplified
- * 
+ * - Tune PID for gear
+ * - Switchable Drive
  *
  */
  
