@@ -37,9 +37,9 @@ public class Robot extends IterativeRobot {
 	//Motors
 	public static final int LEFTDRIVEMOTOR = 1;
 	public static final int RIGHTDRIVEMOTOR = 0;
-	public static final int CLIMBERMOTOR = 2;
 	public static final int CLAWPIVOTMOTOR = 2;
-	
+	public static final int CLIMBERMOTOR = 2;
+
 	//Pneumatics
 	public static final int PCM = 0;
 	public static final int LOWGEAR = 0;
@@ -98,6 +98,7 @@ public class Robot extends IterativeRobot {
 	public static Compressor driveTrainCompressor;
 	public static DoubleSolenoid driveTrainShifter;
 	
+	
 
 	
 	//Controllers
@@ -110,8 +111,9 @@ public class Robot extends IterativeRobot {
 	public static CANTalon clawPivot;
 	
 	//Climber
-	public static VictorSP climber;
+	public static Climber climber;
 	
+	public static GearClaw claw;
 	//State Machine Enums
 	//DriveStateMachine
 	public static enum DriveStates{
@@ -119,11 +121,7 @@ public class Robot extends IterativeRobot {
 	}
 	public static DriveStates currentDriveState = DriveStates.AUTO;
 	
-	public static enum ClawStates{
-		PICKUP, CLAMP, LIFT, READYTOSCORE ,SCORE
-	}
-
-	public static ClawStates currentClawState = ClawStates.LIFT;
+	
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -139,9 +137,8 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		driveTrainInit();
 		controllerInit();
-		clawInit();
-		climberInit();
-		smartDashboard();
+		climber = new Climber(CLIMBERMOTOR);
+		claw = new GearClaw(PCM, CLAWEXTEND, CLAWRETRACT, CLAWPIVOTMOTOR, clawPIDP, clawPIDI, clawPIDD);
 		
 	}
 	
@@ -205,7 +202,7 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		driveStateMachine(currentDriveState);
 		driverControls();
-		clawStateMachine(currentClawState);
+		claw.stateMachine();
 		smartDashboard();
 	}
 	
@@ -234,19 +231,6 @@ public class Robot extends IterativeRobot {
 		driverGamePad = new Joystick(DRIVERGAMEPAD);
 		operatorGamePad = new Joystick(OPERATORGAMEPAD);
 	}
-	public void clawInit(){
-		clawGrabber = new DoubleSolenoid(PCM, CLAWEXTEND, CLAWRETRACT);
-		clawPivot = new CANTalon(CLAWPIVOTMOTOR);
-		clawPivot.setPID(clawPIDP, clawPIDI, clawPIDD);
-		clawPivot.configMaxOutputVoltage(5);
-		clawPivot.setAllowableClosedLoopErr(200);
-		//clawPivot.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
-		clawPivot.setEncPosition(clawPivot.getPulseWidthPosition());
-		clawPivot.reverseOutput(true);
-	}
-	public void climberInit(){
-		climber = new VictorSP(CLIMBERMOTOR);
-	}
 	
 	public void driveStateMachine(DriveStates DriveState){
 		switch(DriveState){
@@ -262,31 +246,7 @@ public class Robot extends IterativeRobot {
 
 		}
 	}
-	public void clawStateMachine(ClawStates ClawState){	
-		
-		switch(ClawState){
-		case PICKUP:
-			clawPickup();
-			clawExtend();
-			break;
-		case CLAMP:
-			clawDown();
-			clawRetract();
-			break;
-		case LIFT:
-			clawUp();
-			clawRetract();
-			break;
-		case READYTOSCORE:
-			clawScore();
-			clawRetract();
-			break;
-		case SCORE:
-			clawScore();
-			clawExtend();
-			break;
-		}
-	}
+	
 	
 	public void shiftUp(){
 		driveTrainShifter.set(DoubleSolenoid.Value.kReverse);
@@ -314,22 +274,22 @@ public class Robot extends IterativeRobot {
 			shiftDown();
 		}
 		if(driverGamePad.getRawButton(PICKUPBTN)){
-			currentClawState = ClawStates.PICKUP;
+			claw.setClawState(GearClaw.ClawStates.PICKUP);
 		}
 		if(driverGamePad.getRawButton(CLAMPBTN)){
-			currentClawState = ClawStates.CLAMP;
+			claw.setClawState(GearClaw.ClawStates.CLAMP);
 		}
 		if(driverGamePad.getRawButton(CLIMBFASTBTN)){
-			clawRetract();
+			claw.retract();
 		}
 		if(driverGamePad.getRawButton(CLIMBSLOWBTN)){
-			clawExtend();
+			claw.extend();
 		}
 		if(driverGamePad.getRawButton(READYTOSCOREBTN)){
-			currentClawState = ClawStates.READYTOSCORE;
+			claw.setClawState(GearClaw.ClawStates.READYTOSCORE);;
 		}
 		if(driverGamePad.getRawButton(PLACEBTN)){
-			currentClawState = ClawStates.SCORE;
+			claw.setClawState(GearClaw.ClawStates.SCORE);;
 		}
 	}
 	
@@ -337,39 +297,7 @@ public class Robot extends IterativeRobot {
 		
 	}
 	
-	public void clawExtend(){
-		clawGrabber.set(DoubleSolenoid.Value.kForward);
-	}
-	public void clawRetract(){
-		clawGrabber.set(DoubleSolenoid.Value.kReverse);
-	}
-	public void clawDown(){
-		//Enc PW Pos of 1920
-		clawPivot.changeControlMode(TalonControlMode.Position);
-		
-		clawPivot.set(4000);
-		
-	}
-	public void clawUp(){
-		//Enc PW Pos of 890
-		clawPivot.changeControlMode(TalonControlMode.Position);
-		clawPivot.set(3000);
-	}
-	public void climbSlow(){
-		climber.set(0.2);
-	}
-	public void climbFast(){
-		climber.set(0);
-	}
-	public void clawPickup(){
-		clawPivot.changeControlMode(TalonControlMode.Position);
-		clawPivot.set(3870);
-	}
-	public void clawScore(){
-		clawPivot.changeControlMode(TalonControlMode.Position);
-		clawPivot.set(3300);
-	}
-	
+
 
 	public void smartDashboard(){
 		if(DEBUG){
