@@ -11,11 +11,11 @@ public class GearClaw {
 	public static CANTalon pivotMotor;
 	public static DoubleSolenoid clamp;
 	
-	public static enum ClawStates{
+	public static enum states{
 		PICKUP, CLAMP, LIFT, READYTOSCORE ,SCORE
 	}
 
-	public static ClawStates currentClawState = ClawStates.LIFT;
+	public static states currentState = states.LIFT;
 	
 	public GearClaw(int PCMCanID, int PCMForwardChannel, int PCMReverseChannel, int CANTalonID, double TalonP, double TalonI, double TalonD){
 		clamp = new DoubleSolenoid(PCMCanID, PCMForwardChannel, PCMReverseChannel);
@@ -57,7 +57,7 @@ public class GearClaw {
 	}
 	
 	public void stateMachine(){
-			switch(currentClawState){
+			switch(currentState){
 			case PICKUP:
 				pickup();
 				extend();
@@ -82,8 +82,8 @@ public class GearClaw {
 		
 	}
 	
-	public void setClawState(ClawStates newState){
-		currentClawState = newState;
+	public void setState(states newState){
+		currentState = newState;
 	}
 	
 }

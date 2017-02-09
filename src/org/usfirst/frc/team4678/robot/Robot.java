@@ -1,12 +1,11 @@
 package org.usfirst.frc.team4678.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.*;
 import com.ctre.CANTalon;
-import com.ctre.CANTalon.FeedbackDevice;
-import com.ctre.CANTalon.TalonControlMode;
+
 
 
 
@@ -93,10 +92,7 @@ public class Robot extends IterativeRobot {
 	
 	
 	//DriveTrain
-	public static VictorSP driveTrainLeftMotor;
-	public static VictorSP driveTrainRightMotor; 
-	public static Compressor driveTrainCompressor;
-	public static DoubleSolenoid driveTrainShifter;
+
 	
 	
 
@@ -114,12 +110,11 @@ public class Robot extends IterativeRobot {
 	public static Climber climber;
 	
 	public static GearClaw claw;
+	
+	public static DriveTrain driveTrain;
 	//State Machine Enums
 	//DriveStateMachine
-	public static enum DriveStates{
-		JOYSTICKDRIVE, AUTO, DISABLED
-	}
-	public static DriveStates currentDriveState = DriveStates.AUTO;
+	
 	
 	
 	
@@ -135,8 +130,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
-		driveTrainInit();
 		controllerInit();
+		driveTrain = new DriveTrain(LEFTDRIVEMOTOR, RIGHTDRIVEMOTOR, COMPRESSOR, PCM, HIGHGEAR, LOWGEAR, driverGamePad);
 		climber = new Climber(CLIMBERMOTOR);
 		claw = new GearClaw(PCM, CLAWEXTEND, CLAWRETRACT, CLAWPIVOTMOTOR, clawPIDP, clawPIDI, clawPIDD);
 		
@@ -196,12 +191,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopInit(){
-		currentDriveState = DriveStates.JOYSTICKDRIVE;
+		driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE);
 	}
 	@Override
 	public void teleopPeriodic() {
-		driveStateMachine(currentDriveState);
 		driverControls();
+		driveTrain.stateMachine();
 		claw.stateMachine();
 		smartDashboard();
 	}
@@ -219,65 +214,25 @@ public class Robot extends IterativeRobot {
 		
 	}
 	
-	public void driveTrainInit(){
-		driveTrainLeftMotor = new VictorSP(LEFTDRIVEMOTOR);
-		driveTrainRightMotor = new VictorSP(RIGHTDRIVEMOTOR);
-		driveTrainCompressor = new Compressor(COMPRESSOR);
-		driveTrainShifter = new DoubleSolenoid(PCM, HIGHGEAR, LOWGEAR);
-		driveTrainCompressor.setClosedLoopControl(true);
-	}
 	public void controllerInit(){
 
 		driverGamePad = new Joystick(DRIVERGAMEPAD);
 		operatorGamePad = new Joystick(OPERATORGAMEPAD);
 	}
 	
-	public void driveStateMachine(DriveStates DriveState){
-		switch(DriveState){
-			case JOYSTICKDRIVE:
-				joyStickDrive();
-				break;
-			case AUTO:
-				
-				break;
-			case DISABLED:
-				
-				break;
-
-		}
-	}
 	
-	
-	public void shiftUp(){
-		driveTrainShifter.set(DoubleSolenoid.Value.kReverse);
-	}
-	public void shiftDown(){
-		driveTrainShifter.set(DoubleSolenoid.Value.kForward);
-	}
-	
-	public void joyStickDrive(){
-		double gamePadY, gamePadX, leftPower, rightPower;
-		gamePadX = driverGamePad.getRawAxis(0);
-		gamePadY = driverGamePad.getRawAxis(1);
-		leftPower = gamePadY + gamePadX;
-		rightPower = gamePadY - gamePadX;
-		driveTrainLeftMotor.set(-leftPower);
-		driveTrainRightMotor.set(rightPower);
-		
-		
-	}
 	public void driverControls(){
 		if(driverGamePad.getRawButton(SHIFTUPBTN)){
-			shiftUp();
+			driveTrain.shiftUp();
 		}
 		if(driverGamePad.getRawButton(SHIFTDOWNBTN)){
-			shiftDown();
+			driveTrain.shiftDown();
 		}
 		if(driverGamePad.getRawButton(PICKUPBTN)){
-			claw.setClawState(GearClaw.ClawStates.PICKUP);
+			claw.setState(GearClaw.states.PICKUP);
 		}
 		if(driverGamePad.getRawButton(CLAMPBTN)){
-			claw.setClawState(GearClaw.ClawStates.CLAMP);
+			claw.setState(GearClaw.states.CLAMP);
 		}
 		if(driverGamePad.getRawButton(CLIMBFASTBTN)){
 			claw.retract();
@@ -286,10 +241,10 @@ public class Robot extends IterativeRobot {
 			claw.extend();
 		}
 		if(driverGamePad.getRawButton(READYTOSCOREBTN)){
-			claw.setClawState(GearClaw.ClawStates.READYTOSCORE);;
+			claw.setState(GearClaw.states.READYTOSCORE);;
 		}
 		if(driverGamePad.getRawButton(PLACEBTN)){
-			claw.setClawState(GearClaw.ClawStates.SCORE);;
+			claw.setState(GearClaw.states.SCORE);;
 		}
 	}
 	
