@@ -41,10 +41,10 @@ public class Robot extends IterativeRobot {
 
 	//Pneumatics
 	public static final int PCM = 0;
-	public static final int LOWGEAR = 0;
-	public static final int HIGHGEAR = 1;
-	public static final int CLAWRETRACT = 2;
-	public static final int CLAWEXTEND = 3;
+	public static final int LOWGEAR = 2;
+	public static final int HIGHGEAR = 3;
+	public static final int CLAWRETRACT = 1;
+	public static final int CLAWEXTEND = 0;
 	
 	public static final boolean DEBUG = true;
 	
@@ -54,7 +54,7 @@ public class Robot extends IterativeRobot {
 	
 	//PIDConstants
 	//Claw
-	public static final double clawPIDP = 0.7;
+	public static final double clawPIDP = 3;
 	public static final double clawPIDI = 0;
 	public static final double clawPIDD = 0;
 	
@@ -106,11 +106,9 @@ public class Robot extends IterativeRobot {
 	public static DoubleSolenoid clawGrabber;
 	public static CANTalon clawPivot;
 	
-	//Climber
+	//ROBOT CLASSES
 	public static Climber climber;
-	
 	public static GearClaw claw;
-	
 	public static DriveTrain driveTrain;
 	//State Machine Enums
 	//DriveStateMachine
@@ -234,10 +232,10 @@ public class Robot extends IterativeRobot {
 		if(driverGamePad.getRawButton(CLAMPBTN)){
 			claw.setState(GearClaw.states.CLAMP);
 		}
-		if(driverGamePad.getRawButton(CLIMBFASTBTN)){
+		if(driverGamePad.getRawButton(7)){
 			claw.retract();
 		}
-		if(driverGamePad.getRawButton(CLIMBSLOWBTN)){
+		if(driverGamePad.getRawButton(8)){
 			claw.extend();
 		}
 		if(driverGamePad.getRawButton(READYTOSCOREBTN)){
@@ -246,6 +244,7 @@ public class Robot extends IterativeRobot {
 		if(driverGamePad.getRawButton(PLACEBTN)){
 			claw.setState(GearClaw.states.SCORE);;
 		}
+		
 	}
 	
 	public void operatorControls(){
@@ -256,8 +255,8 @@ public class Robot extends IterativeRobot {
 
 	public void smartDashboard(){
 		if(DEBUG){
-			SmartDashboard.putNumber("Claw Encoder", clawPivot.getPulseWidthPosition());
-			SmartDashboard.putNumber("Claw Encoder 2", clawPivot.getEncPosition());
+			SmartDashboard.putNumber("Claw Encoder", claw.pivotMotor.getPulseWidthPosition());
+			//SmartDashboard.putNumber("Claw Encoder 2", clawPivot.getEncPosition());
 			
 
 			SmartDashboard.putString("Auto Mode", autoModes[autoMode]);

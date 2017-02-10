@@ -14,7 +14,7 @@ public class DriveTrain {
 	public static Compressor compressor;
 	public static DoubleSolenoid shifter;
 	public static Joystick driveGamePad;
-	public static final int AXIS = 0; //0 for Left Axis, 2 for Right
+	public static final int AXIS = 0; //0 for Left Joystick on Controller, 2 for Right
 	
 	
 	public static enum states{
@@ -55,10 +55,18 @@ public class DriveTrain {
 		}
 		
 	}
+	
+	public double maintainSignSquare(double val){
+		if(val < 0){
+			return -(val*val);
+		}else{
+			return(val*val);
+		}
+	}
 	public void joyStickDrive(){
 		double gamePadY, gamePadX, leftPower, rightPower;
-		gamePadX = driveGamePad.getRawAxis(AXIS);
-		gamePadY = driveGamePad.getRawAxis(AXIS+1);
+		gamePadX = maintainSignSquare(driveGamePad.getRawAxis(AXIS));
+		gamePadY = maintainSignSquare(driveGamePad.getRawAxis(AXIS+1));
 		leftPower = gamePadY + gamePadX;
 		rightPower = gamePadY - gamePadX;
 		leftMotor.set(-leftPower);
@@ -66,6 +74,8 @@ public class DriveTrain {
 		
 		
 	}
+	
+
 	
 	public void setState(states newState){
 		currentState = newState;
