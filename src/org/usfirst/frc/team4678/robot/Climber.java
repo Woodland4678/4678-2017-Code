@@ -10,6 +10,10 @@ public class Climber {
 	}
 	
 	public void climbFast(){
+		climbMotor.set(1);
+	}
+	
+	public void climbMedium(){
 		climbMotor.set(0.5);
 	}
 	

@@ -53,7 +53,7 @@ public class GearClaw {
 	}
 	public void score(){
 		pivotMotor.changeControlMode(TalonControlMode.Position);
-		pivotMotor.set(3370);
+		pivotMotor.set(3350);
 	}
 	
 	public void stateMachine(){

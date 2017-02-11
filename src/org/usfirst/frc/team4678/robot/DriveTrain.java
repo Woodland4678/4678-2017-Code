@@ -67,8 +67,11 @@ public class DriveTrain {
 		double gamePadY, gamePadX, leftPower, rightPower;
 		gamePadX = maintainSignSquare(driveGamePad.getRawAxis(AXIS));
 		gamePadY = maintainSignSquare(driveGamePad.getRawAxis(AXIS+1));
-		leftPower = gamePadY + gamePadX;
-		rightPower = gamePadY - gamePadX;
+		if(gamePadX< 0.05 && gamePadX > -0.05){
+			gamePadX = 0;
+		}
+		leftPower = gamePadY + 0.75*gamePadX;
+		rightPower = gamePadY - 0.75*gamePadX;
 		leftMotor.set(-leftPower);
 		rightMotor.set(rightPower);
 		

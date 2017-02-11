@@ -38,7 +38,8 @@ public class Robot extends IterativeRobot {
 	public static final int RIGHTDRIVEMOTOR = 0;
 	public static final int CLAWPIVOTMOTOR = 2;
 	public static final int CLIMBERMOTOR = 2;
-
+	public static final int BALLPIVOTMOTOR = 0;
+	public static final int BALLROLLERMOTOR =1 ;
 	//Pneumatics
 	public static final int PCM = 0;
 	public static final int LOWGEAR = 2;
@@ -70,8 +71,8 @@ public class Robot extends IterativeRobot {
 	public static final int CLAMPBTN = 3;
 	public static final int READYTOSCOREBTN = 2;
 	public static final int PLACEBTN = 1;
-	public static final int SHIFTUPBTN = 5;
-	public static final int SHIFTDOWNBTN = 6;
+	public static final int SHIFTUPBTN = 6;
+	public static final int SHIFTDOWNBTN = 5;
 	public static final int CLIMBFASTBTN = 7;
 	public static final int CLIMBSLOWBTN = 8;
 	public static String autoModes[] = {
@@ -110,6 +111,7 @@ public class Robot extends IterativeRobot {
 	public static Climber climber;
 	public static GearClaw claw;
 	public static DriveTrain driveTrain;
+	public static Baller baller;
 	//State Machine Enums
 	//DriveStateMachine
 	
@@ -132,7 +134,7 @@ public class Robot extends IterativeRobot {
 		driveTrain = new DriveTrain(LEFTDRIVEMOTOR, RIGHTDRIVEMOTOR, COMPRESSOR, PCM, HIGHGEAR, LOWGEAR, driverGamePad);
 		climber = new Climber(CLIMBERMOTOR);
 		claw = new GearClaw(PCM, CLAWEXTEND, CLAWRETRACT, CLAWPIVOTMOTOR, clawPIDP, clawPIDI, clawPIDD);
-		
+		baller = new Baller(BALLPIVOTMOTOR, BALLROLLERMOTOR);
 	}
 	
 	@Override
@@ -220,11 +222,11 @@ public class Robot extends IterativeRobot {
 	
 	
 	public void driverControls(){
-		if(driverGamePad.getRawButton(SHIFTUPBTN)){
-			driveTrain.shiftUp();
-		}
 		if(driverGamePad.getRawButton(SHIFTDOWNBTN)){
 			driveTrain.shiftDown();
+		}
+		if(driverGamePad.getRawButton(SHIFTUPBTN)){
+			driveTrain.shiftUp();
 		}
 		if(driverGamePad.getRawButton(PICKUPBTN)){
 			claw.setState(GearClaw.states.PICKUP);
@@ -244,6 +246,25 @@ public class Robot extends IterativeRobot {
 		if(driverGamePad.getRawButton(PLACEBTN)){
 			claw.setState(GearClaw.states.SCORE);;
 		}
+		if(driverGamePad.getPOV() == 180){
+			baller.pickup();
+		}
+		if(driverGamePad.getPOV() == 0){
+			baller.enclose();
+		}
+		if(driverGamePad.getPOV() == 90){
+			baller.release();
+		}
+		
+		if(operatorGamePad.getPOV() == 0){
+			climber.climbFast();
+		}else if(operatorGamePad.getPOV() == 90){
+			climber.climbMedium();
+		}else if(operatorGamePad.getPOV() == 180){
+			climber.climbSlow();
+		}else{
+			climber.climbStop();
+		}
 		
 	}
 	
@@ -256,8 +277,10 @@ public class Robot extends IterativeRobot {
 	public void smartDashboard(){
 		if(DEBUG){
 			SmartDashboard.putNumber("Claw Encoder", claw.pivotMotor.getPulseWidthPosition());
+			SmartDashboard.putNumber("Ball Pivot Encoder", baller.pivotMotor.getPulseWidthPosition());
+			//SmartDashboard.putNumber("Ball Roller Encoder", baller.intakeMotor.getPulseWidthPosition());
 			//SmartDashboard.putNumber("Claw Encoder 2", clawPivot.getEncPosition());
-			
+			SmartDashboard.putNumber("POV", driverGamePad.getPOV());
 
 			SmartDashboard.putString("Auto Mode", autoModes[autoMode]);
 		}else {
