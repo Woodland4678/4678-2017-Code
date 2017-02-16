@@ -6,8 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.*;
 import com.ctre.CANTalon;
 
-
-
+import edu.wpi.first.wpilibj.CameraServer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -135,6 +134,8 @@ public class Robot extends IterativeRobot {
 		climber = new Climber(CLIMBERMOTOR);
 		claw = new GearClaw(PCM, CLAWEXTEND, CLAWRETRACT, CLAWPIVOTMOTOR, clawPIDP, clawPIDI, clawPIDD);
 		baller = new Baller(BALLPIVOTMOTOR, BALLROLLERMOTOR);
+		
+		CameraServer.getInstance().startAutomaticCapture(); //Added by Josh working on getting simple vision working (later will be replaced with code on pi, but thought it would be useful for practise)
 	}
 	
 	@Override
