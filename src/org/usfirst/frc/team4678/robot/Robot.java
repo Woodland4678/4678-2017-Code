@@ -33,12 +33,18 @@ public class Robot extends IterativeRobot {
 	//Compressor
 	public static final int COMPRESSOR = 0;
 	//Motors
-	public static final int LEFTDRIVEMOTOR = 1;
-	public static final int RIGHTDRIVEMOTOR = 0;
+	public static final int LEFTDRIVEMOTOR = 1; //pwm 1
+	public static final int RIGHTDRIVEMOTOR = 0; //pwm 0 
+	public static final int RIGHT_ENC_CHANNEL_A = 0;
+	public static final int RIGHT_ENC_CHANNEL_B = 1;
+	public static final int LEFT_ENC_CHANNEL_A = 2;
+	public static final int LEFT_ENC_CHANNEL_B = 3;
 	public static final int CLAWPIVOTMOTOR = 2;
-	public static final int CLIMBERMOTOR = 2;
+	public static final int CLIMBERMOTOR = 2; //pwm 2
 	public static final int BALLPIVOTMOTOR = 0;
 	public static final int BALLROLLERMOTOR =1 ;
+	public static final int WINDMILLSPINMOTOR = 3; //pwm 3
+	public static final int WINDMILLLIFTMOTOR = 4; //pwm 4
 	//Pneumatics
 	public static final int PCM = 0;
 	public static final int LOWGEAR = 2;
@@ -130,12 +136,13 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		controllerInit();
-		driveTrain = new DriveTrain(LEFTDRIVEMOTOR, RIGHTDRIVEMOTOR, COMPRESSOR, PCM, HIGHGEAR, LOWGEAR, driverGamePad);
+		driveTrain = new DriveTrain(LEFTDRIVEMOTOR, RIGHTDRIVEMOTOR, COMPRESSOR, PCM, HIGHGEAR, LOWGEAR, driverGamePad,RIGHT_ENC_CHANNEL_A,RIGHT_ENC_CHANNEL_B,LEFT_ENC_CHANNEL_A,LEFT_ENC_CHANNEL_B);
 		climber = new Climber(CLIMBERMOTOR);
 		claw = new GearClaw(PCM, CLAWEXTEND, CLAWRETRACT, CLAWPIVOTMOTOR, clawPIDP, clawPIDI, clawPIDD);
-		baller = new Baller(BALLPIVOTMOTOR, BALLROLLERMOTOR);
+		baller = new Baller(BALLPIVOTMOTOR, BALLROLLERMOTOR,WINDMILLSPINMOTOR,WINDMILLLIFTMOTOR);
 		
 		CameraServer.getInstance().startAutomaticCapture(); //Added by Josh working on getting simple vision working (later will be replaced with code on pi, but thought it would be useful for practise)
+		
 	}
 	
 	@Override
@@ -197,6 +204,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		driverControls();
+		operatorControls();
 		driveTrain.stateMachine();
 		claw.stateMachine();
 		smartDashboard();
@@ -270,7 +278,19 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void operatorControls(){
-		
+		if(operatorGamePad.getRawButton(1)) {
+			baller.lowerMills();
+		}
+		if(operatorGamePad.getRawButton(4)) {
+			baller.stopMills();
+			baller.liftMills();
+		}
+		if(operatorGamePad.getRawButton(3)) {
+			baller.spinMillOut();
+		}
+		if(operatorGamePad.getRawButton(2)) {
+			baller.spinMillIn();
+		}
 	}
 	
 
@@ -279,6 +299,8 @@ public class Robot extends IterativeRobot {
 		if(DEBUG){
 			SmartDashboard.putNumber("Claw Encoder", claw.pivotMotor.getPulseWidthPosition());
 			SmartDashboard.putNumber("Ball Pivot Encoder", baller.pivotMotor.getPulseWidthPosition());
+			SmartDashboard.putNumber("Right Encoder", driveTrain.rightEncoder.get());
+			SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
 			//SmartDashboard.putNumber("Ball Roller Encoder", baller.intakeMotor.getPulseWidthPosition());
 			//SmartDashboard.putNumber("Claw Encoder 2", clawPivot.getEncPosition());
 			SmartDashboard.putNumber("POV", driverGamePad.getPOV());

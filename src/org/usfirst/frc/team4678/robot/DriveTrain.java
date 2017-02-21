@@ -3,14 +3,19 @@ package org.usfirst.frc.team4678.robot;
 
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.VictorSP;
 
 public class DriveTrain {
 	
 	public static VictorSP leftMotor;
-	public static VictorSP rightMotor; 
+	public static VictorSP rightMotor;
+	public static Encoder leftEncoder;
+	public static Encoder rightEncoder;
 	public static Compressor compressor;
 	public static DoubleSolenoid shifter;
 	public static Joystick driveGamePad;
@@ -22,9 +27,18 @@ public class DriveTrain {
 	}
 	public static states currentState = states.AUTO;
 	
-	public DriveTrain(int leftPWM, int rightPWM, int compressorID, int PCMCanID, int PCMForwardChannel, int PCMReverseChannel, Joystick gamePad){
+	public DriveTrain(int leftPWM, int rightPWM, int compressorID, int PCMCanID, int PCMForwardChannel, int PCMReverseChannel, Joystick gamePad, int rightEncChannelA, int rightEncChannelB, int leftEncChannelA, int leftEncChannelB){
 		leftMotor = new VictorSP(leftPWM);
 		rightMotor = new VictorSP(rightPWM);
+		
+		rightEncoder = new Encoder(rightEncChannelA,rightEncChannelB,false, EncodingType.k4X);
+		rightEncoder.setDistancePerPulse(1.0);
+		rightEncoder.setPIDSourceType(PIDSourceType.kRate);
+		
+		leftEncoder = new Encoder(leftEncChannelA,leftEncChannelB,false, EncodingType.k4X);
+		leftEncoder.setDistancePerPulse(1.0);
+		leftEncoder.setPIDSourceType(PIDSourceType.kRate);
+		
 		compressor = new Compressor(compressorID);
 		shifter = new DoubleSolenoid(PCMCanID, PCMForwardChannel, PCMReverseChannel);
 		compressor.setClosedLoopControl(true);

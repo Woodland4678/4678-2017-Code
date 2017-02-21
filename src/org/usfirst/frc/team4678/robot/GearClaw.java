@@ -11,6 +11,18 @@ public class GearClaw {
 	public static CANTalon pivotMotor;
 	public static DoubleSolenoid clamp;
 	
+	//Practice bot positions
+//	public static final int CLAW_PICKUP_POS = 3930;
+//	public static final int CLAW_DOWN_POS = PRACTICE_PICKUP_POS + 70;
+//	public static final int CLAW_UP_POS = 3000;
+//	public static final int CLAW_SCORE_POS = 3350;
+	
+	//Competition bot positions
+	public static final int CLAW_PICKUP_POS = 2741;
+	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
+	public static final int CLAW_UP_POS = 1740;
+	public static final int CLAW_SCORE_POS = 2114;
+	
 	public static enum states{
 		PICKUP, CLAMP, LIFT, READYTOSCORE ,SCORE, MANUAL
 	}
@@ -25,7 +37,7 @@ public class GearClaw {
 		pivotMotor.setAllowableClosedLoopErr(30);
 		//clawPivot.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
-		pivotMotor.reverseOutput(true);
+		pivotMotor.reverseOutput(false);
 	}
 	
 	public void extend(){
@@ -38,22 +50,22 @@ public class GearClaw {
 		//Enc PW Pos of 1920
 		pivotMotor.changeControlMode(TalonControlMode.Position);
 		
-		pivotMotor.set(4000);
+		pivotMotor.set(CLAW_DOWN_POS);
 		
 	}
 	public void up(){
 		//Enc PW Pos of 890
 		pivotMotor.changeControlMode(TalonControlMode.Position);
-		pivotMotor.set(3000);
+		pivotMotor.set(CLAW_UP_POS);
 	}
 	
 	public void pickup(){
 		pivotMotor.changeControlMode(TalonControlMode.Position);
-		pivotMotor.set(3930);
+		pivotMotor.set(CLAW_PICKUP_POS);
 	}
 	public void score(){
 		pivotMotor.changeControlMode(TalonControlMode.Position);
-		pivotMotor.set(3350);
+		pivotMotor.set(CLAW_SCORE_POS);
 	}
 	
 	public void stateMachine(){
