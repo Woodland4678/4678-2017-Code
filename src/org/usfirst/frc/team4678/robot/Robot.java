@@ -33,24 +33,24 @@ public class Robot extends IterativeRobot {
 	//Compressor
 	public static final int COMPRESSOR = 0;
 	//Motors
-	public static final int LEFTDRIVEMOTOR = 1; //pwm 1
-	public static final int RIGHTDRIVEMOTOR = 0; //pwm 0 
+	public static final int LEFT_DRIVE_MOTOR = 1; //pwm 1
+	public static final int RIGHT_DRIVE_MOTOR = 0; //pwm 0 
 	public static final int RIGHT_ENC_CHANNEL_A = 0;
 	public static final int RIGHT_ENC_CHANNEL_B = 1;
 	public static final int LEFT_ENC_CHANNEL_A = 2;
 	public static final int LEFT_ENC_CHANNEL_B = 3;
-	public static final int CLAWPIVOTMOTOR = 2;
-	public static final int CLIMBERMOTOR = 2; //pwm 2
-	public static final int BALLPIVOTMOTOR = 0;
-	public static final int BALLROLLERMOTOR =1 ;
-	public static final int WINDMILLSPINMOTOR = 3; //pwm 3
-	public static final int WINDMILLLIFTMOTOR = 4; //pwm 4
+	public static final int CLAW_PIVOT_MOTOR = 2;
+	public static final int CLIMBER_MOTOR = 2; //pwm 2
+	public static final int BALL_PIVOT_MOTOR = 0;
+	public static final int BALL_ROLLER_MOTOR =1 ;
+	public static final int WIND_MILL_SPIN_MOTOR = 3; //pwm 3
+	public static final int WIND_MILL_LIFT_MOTOR = 4; //pwm 4
 	//Pneumatics
 	public static final int PCM = 0;
-	public static final int LOWGEAR = 2;
-	public static final int HIGHGEAR = 3;
-	public static final int CLAWRETRACT = 1;
-	public static final int CLAWEXTEND = 0;
+	public static final int LOW_GEAR = 2;
+	public static final int HIGH_GEAR = 3;
+	public static final int CLAW_RETRACT = 1;
+	public static final int CLAW_EXTEND = 0;
 	
 	public static final boolean DEBUG = true;
 	
@@ -136,10 +136,10 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		controllerInit();
-		driveTrain = new DriveTrain(LEFTDRIVEMOTOR, RIGHTDRIVEMOTOR, COMPRESSOR, PCM, HIGHGEAR, LOWGEAR, driverGamePad,RIGHT_ENC_CHANNEL_A,RIGHT_ENC_CHANNEL_B,LEFT_ENC_CHANNEL_A,LEFT_ENC_CHANNEL_B);
-		climber = new Climber(CLIMBERMOTOR);
-		claw = new GearClaw(PCM, CLAWEXTEND, CLAWRETRACT, CLAWPIVOTMOTOR, clawPIDP, clawPIDI, clawPIDD);
-		baller = new Baller(BALLPIVOTMOTOR, BALLROLLERMOTOR,WINDMILLSPINMOTOR,WINDMILLLIFTMOTOR);
+		driveTrain = new DriveTrain(LEFT_DRIVE_MOTOR, RIGHT_DRIVE_MOTOR, COMPRESSOR, PCM, HIGH_GEAR, LOW_GEAR, driverGamePad,RIGHT_ENC_CHANNEL_A,RIGHT_ENC_CHANNEL_B,LEFT_ENC_CHANNEL_A,LEFT_ENC_CHANNEL_B);
+		climber = new Climber(CLIMBER_MOTOR);
+		claw = new GearClaw(PCM, CLAW_EXTEND, CLAW_RETRACT, CLAW_PIVOT_MOTOR, clawPIDP, clawPIDI, clawPIDD);
+		baller = new Baller(BALL_PIVOT_MOTOR, BALL_ROLLER_MOTOR,WIND_MILL_SPIN_MOTOR,WIND_MILL_LIFT_MOTOR);
 		
 		CameraServer.getInstance().startAutomaticCapture(); //Added by Josh working on getting simple vision working (later will be replaced with code on pi, but thought it would be useful for practise)
 		

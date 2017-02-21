@@ -28,8 +28,8 @@ public class Baller {
 	public static final int INTAKE_ENCLOSED_HEIGHT = 1988;
 	
 	//Intake Motor Constants
-	public static final int PICKUPSPEED = 0; //20000
-	public static final int RELEASESPEED = 0; //-22000
+	public static final int PICKUPSPEED = 20000; //20000
+	public static final int RELEASESPEED = -22000; //-22000
 	public static CANTalon pivotMotor;
 	public static CANTalon intakeMotor;
 	
