@@ -45,6 +45,8 @@ public class Robot extends IterativeRobot {
 	public static final int BALL_ROLLER_MOTOR =1 ;
 	public static final int WIND_MILL_SPIN_MOTOR = 3; //pwm 3
 	public static final int WIND_MILL_LIFT_MOTOR = 4; //pwm 4
+	public static final int PICKUP_PANEL_SERVO_LEFT_ID = 5; //pwm 5
+	public static final int PICKUP_PANEL_SERVO_RIGHT_ID = 6; //pwm 6
 	//Pneumatics
 	public static final int PCM = 0;
 	public static final int LOW_GEAR = 2;
@@ -68,18 +70,18 @@ public class Robot extends IterativeRobot {
 	//GamePadMapping
 	
 	//Driver
-	public static final int LEFTAXISX = 0;
-	public static final int LEFTAXISY = 1;
-	public static final int RIGHTAXISX = 2;
-	public static final int RIGHTAXISY = 3;
-	public static final int PICKUPBTN = 4;
-	public static final int CLAMPBTN = 3;
-	public static final int READYTOSCOREBTN = 2;
-	public static final int PLACEBTN = 1;
-	public static final int SHIFTUPBTN = 6;
-	public static final int SHIFTDOWNBTN = 5;
-	public static final int CLIMBFASTBTN = 7;
-	public static final int CLIMBSLOWBTN = 8;
+	public static final int LEFT_AXISX = 0;
+	public static final int LEFT_AXISY = 1;
+	public static final int RIGHT_AXISX = 2;
+	public static final int RIGHT_AXISY = 3;
+	public static final int PICKUP_BTN = 4;
+	public static final int CLAMP_BTN = 3;
+	public static final int READY_TO_SCORE_BTN = 2;
+	public static final int PLACE_BTN = 1;
+	public static final int SHIFT_UP_BTN = 6;
+	public static final int SHIFT_DOWN_BTN = 5;
+	public static final int CLIMB_FAST_BTN = 7;
+	public static final int CLIMB_SLOW_BTN = 8;
 	public static String autoModes[] = {
 			"Do Nothing",
 			"Mode 1",
@@ -139,7 +141,7 @@ public class Robot extends IterativeRobot {
 		driveTrain = new DriveTrain(LEFT_DRIVE_MOTOR, RIGHT_DRIVE_MOTOR, COMPRESSOR, PCM, HIGH_GEAR, LOW_GEAR, driverGamePad,RIGHT_ENC_CHANNEL_A,RIGHT_ENC_CHANNEL_B,LEFT_ENC_CHANNEL_A,LEFT_ENC_CHANNEL_B);
 		climber = new Climber(CLIMBER_MOTOR);
 		claw = new GearClaw(PCM, CLAW_EXTEND, CLAW_RETRACT, CLAW_PIVOT_MOTOR, clawPIDP, clawPIDI, clawPIDD);
-		baller = new Baller(BALL_PIVOT_MOTOR, BALL_ROLLER_MOTOR,WIND_MILL_SPIN_MOTOR,WIND_MILL_LIFT_MOTOR);
+		baller = new Baller(BALL_PIVOT_MOTOR, BALL_ROLLER_MOTOR, WIND_MILL_SPIN_MOTOR, WIND_MILL_LIFT_MOTOR, PICKUP_PANEL_SERVO_LEFT_ID, PICKUP_PANEL_SERVO_RIGHT_ID);
 		
 		CameraServer.getInstance().startAutomaticCapture(); //Added by Josh working on getting simple vision working (later will be replaced with code on pi, but thought it would be useful for practise)
 		
@@ -231,17 +233,19 @@ public class Robot extends IterativeRobot {
 	
 	
 	public void driverControls(){
-		if(driverGamePad.getRawButton(SHIFTDOWNBTN)){
+		if(driverGamePad.getRawButton(SHIFT_DOWN_BTN)){ //button 5
 			driveTrain.shiftDown();
 		}
-		if(driverGamePad.getRawButton(SHIFTUPBTN)){
+		if(driverGamePad.getRawButton(SHIFT_UP_BTN)){ //button 6
 			driveTrain.shiftUp();
 		}
-		if(driverGamePad.getRawButton(PICKUPBTN)){
-			claw.setState(GearClaw.states.PICKUP);
+		if(driverGamePad.getRawButton(PICKUP_BTN) && baller.getCanLowerClawStatus() == true){ //The button must be pressed and the pickup panel must not be deployed
+			claw.setState(GearClaw.states.PICKUP); //button 4
+			System.out.println("Claw status okay going to pickup position!");
 		}
-		if(driverGamePad.getRawButton(CLAMPBTN)){
-			claw.setState(GearClaw.states.CLAMP);
+		if(driverGamePad.getRawButton(CLAMP_BTN) && baller.getCanLowerClawStatus() == true){ //button pressed and the claw must not be lowered
+			claw.setState(GearClaw.states.CLAMP); //button 3
+			System.out.println("Claw status okay clamping gear!");
 		}
 		if(driverGamePad.getRawButton(7)){
 			claw.retract();
@@ -249,19 +253,22 @@ public class Robot extends IterativeRobot {
 		if(driverGamePad.getRawButton(8)){
 			claw.extend();
 		}
-		if(driverGamePad.getRawButton(READYTOSCOREBTN)){
+		if(driverGamePad.getRawButton(READY_TO_SCORE_BTN)){ //button 2
 			claw.setState(GearClaw.states.READYTOSCORE);;
 		}
-		if(driverGamePad.getRawButton(PLACEBTN)){
+		if(driverGamePad.getRawButton(PLACE_BTN)){ //button 1
 			claw.setState(GearClaw.states.SCORE);;
 		}
-		if(driverGamePad.getPOV() == 180){
+		if(driverGamePad.getPOV() == 180 && baller.getCanLowerClawStatus() == false){ //can only move the ball pickup if the pickup panel is deployed (hence lower claw status is false since we cannot lower claw when the panel is deployed)
+			System.out.println("Moving pickup to pickup Position!");
 			baller.pickup();
 		}
-		if(driverGamePad.getPOV() == 0){
+		if((driverGamePad.getPOV() == 0 && baller.getCanLowerClawStatus() == false)){ //can only move the ball pickup if the pickup panel is deployed
+			System.out.println("Moving pickup to enclose Position!");
 			baller.enclose();
 		}
-		if(driverGamePad.getPOV() == 90){
+		if((driverGamePad.getPOV() == 90 && baller.getCanLowerClawStatus() == false)){ //can only move ball pickup if the pickup panel is deployed
+			System.out.println("Moving pickup to release position!");
 			baller.release();
 		}
 		
@@ -278,18 +285,25 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void operatorControls(){
-		if(operatorGamePad.getRawButton(1)) {
+		if(operatorGamePad.getRawButton(1) && claw.canOpenPanel == true) { //can only lower mills if the claw is in an upper position (same situation as the pickup panel)
 			baller.lowerMills();
 		}
 		if(operatorGamePad.getRawButton(4)) {
-			baller.stopMills();
-			baller.liftMills();
+			baller.stopMills(); //stops the mills from spinning
+			baller.liftMills(); //lifts mills to rest position
 		}
 		if(operatorGamePad.getRawButton(3)) {
-			baller.spinMillOut();
+			baller.spinMillOut(); //spins the wind mills away from the robot
 		}
 		if(operatorGamePad.getRawButton(2)) {
-			baller.spinMillIn();
+			baller.spinMillIn(); //spins wind mills towards the intake
+		}
+		if(operatorGamePad.getRawButton(5) && claw.getOpenPanelStaus() == true) { //to open panel we need to make sure the claw is in an upper position to stay within legal volume
+			baller.deployPickUpPanel(); //opens up pickup panel
+			System.out.println("deploy is allowed, opening pickup panel!");
+		}
+		if(operatorGamePad.getRawButton(6)) { //always allowed to do this so no need for extra conditions
+			baller.retractPickUpPanel(); //closes pickup panel
 		}
 	}
 	

@@ -14,8 +14,8 @@ public class DriveTrain {
 	
 	public static VictorSP leftMotor;
 	public static VictorSP rightMotor;
-	public static Encoder leftEncoder; //counts down when robot reverses (ball pickup is back)
-	public static Encoder rightEncoder; //counts down when robot reverses (ball pickup is back)
+	public Encoder leftEncoder; //counts down when robot reverses (ball pickup is back)
+	public Encoder rightEncoder; //counts down when robot reverses (ball pickup is back)
 	public static Compressor compressor;
 	public static DoubleSolenoid shifter;
 	public static Joystick driveGamePad;
