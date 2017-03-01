@@ -205,6 +205,7 @@ public class Robot extends IterativeRobot {
 	}
 	@Override
 	public void teleopPeriodic() {
+		//System.out.println("ONE LAST ONE I HOPE");
 		driverControls();
 		operatorControls();
 		driveTrain.stateMachine();
@@ -251,23 +252,49 @@ public class Robot extends IterativeRobot {
 			claw.retract();
 		}
 		if(driverGamePad.getRawButton(8)){
-			claw.extend();
+			claw.setState(GearClaw.states.READYTOSCORE);
 		}
 		if(driverGamePad.getRawButton(READY_TO_SCORE_BTN)){ //button 2
-			claw.setState(GearClaw.states.READYTOSCORE);;
+			claw.setState(GearClaw.states.HOLD);;
 		}
 		if(driverGamePad.getRawButton(PLACE_BTN)){ //button 1
-			claw.setState(GearClaw.states.SCORE);;
+			claw.setState(GearClaw.states.SCORE);
 		}
-		if(driverGamePad.getPOV() == 180 && baller.getCanLowerClawStatus() == false){ //can only move the ball pickup if the pickup panel is deployed (hence lower claw status is false since we cannot lower claw when the panel is deployed)
+//		if(driverGamePad.getPOV() == 180 && baller.getCanLowerClawStatus() == false){ //can only move the ball pickup if the pickup panel is deployed (hence lower claw status is false since we cannot lower claw when the panel is deployed)
+//			System.out.println("Moving pickup to pickup Position!");
+//			baller.pickup();
+//		}
+//		if((driverGamePad.getPOV() == 0 && baller.getCanLowerClawStatus() == false)){ //can only move the ball pickup if the pickup panel is deployed
+//			System.out.println("Moving pickup to enclose Position!");
+//			baller.enclose();
+//		}
+//		if((driverGamePad.getPOV() == 90 && baller.getCanLowerClawStatus() == false)){ //can only move ball pickup if the pickup panel is deployed
+//			System.out.println("Moving pickup to release position!");
+//			baller.release();
+//		}
+		
+//		if(driverGamePad.getPOV() == 180){ //can only move the ball pickup if the pickup panel is deployed (hence lower claw status is false since we cannot lower claw when the panel is deployed)
+//			System.out.println("Moving pickup to pickup Position!");
+//			baller.pickup();
+//		}
+//		if((driverGamePad.getPOV() == 0)){ //can only move the ball pickup if the pickup panel is deployed
+//			System.out.println("Moving pickup to enclose Position!");
+//			baller.enclose();
+//		}
+//		if((driverGamePad.getPOV() == 90)){ //can only move ball pickup if the pickup panel is deployed
+//			System.out.println("Moving pickup to release position!");
+//			baller.release();
+//		}
+		
+		if(driverGamePad.getRawButton(11)){ //can only move the ball pickup if the pickup panel is deployed (hence lower claw status is false since we cannot lower claw when the panel is deployed)
 			System.out.println("Moving pickup to pickup Position!");
 			baller.pickup();
 		}
-		if((driverGamePad.getPOV() == 0 && baller.getCanLowerClawStatus() == false)){ //can only move the ball pickup if the pickup panel is deployed
+		if(driverGamePad.getRawButton(12)){ //can only move the ball pickup if the pickup panel is deployed
 			System.out.println("Moving pickup to enclose Position!");
 			baller.enclose();
 		}
-		if((driverGamePad.getPOV() == 90 && baller.getCanLowerClawStatus() == false)){ //can only move ball pickup if the pickup panel is deployed
+		if(driverGamePad.getRawButton(7)){ //can only move ball pickup if the pickup panel is deployed
 			System.out.println("Moving pickup to release position!");
 			baller.release();
 		}
@@ -285,7 +312,13 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void operatorControls(){
-		if(operatorGamePad.getRawButton(1) && claw.canOpenPanel == true) { //can only lower mills if the claw is in an upper position (same situation as the pickup panel)
+		//System.out.println("HELLO");
+//		if(operatorGamePad.getRawButton(1) && claw.canOpenPanel == true) { //can only lower mills if the claw is in an upper position (same situation as the pickup panel)
+//			baller.lowerMills();
+//		}
+		
+		if(operatorGamePad.getRawButton(1)) { //can only lower mills if the claw is in an upper position (same situation as the pickup panel)
+			//System.out.println("Trying to lower the wind mills!!!!");
 			baller.lowerMills();
 		}
 		if(operatorGamePad.getRawButton(4)) {
@@ -305,6 +338,12 @@ public class Robot extends IterativeRobot {
 		if(operatorGamePad.getRawButton(6)) { //always allowed to do this so no need for extra conditions
 			baller.retractPickUpPanel(); //closes pickup panel
 		}
+		if (operatorGamePad.getRawButton(7)) {
+			if(driveTrain.goToDistance(100, 100, 0.5, 20, 20, 0.3, 0.2)) {
+				driveTrain.stopDriveMotors();
+				driveTrain.resetGoToDistanceState();
+			}
+		}
 	}
 	
 
@@ -315,6 +354,7 @@ public class Robot extends IterativeRobot {
 			SmartDashboard.putNumber("Ball Pivot Encoder", baller.pivotMotor.getPulseWidthPosition());
 			SmartDashboard.putNumber("Right Encoder", driveTrain.rightEncoder.get());
 			SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
+			SmartDashboard.putNumber("gyro", driveTrain.ahrs.getRawGyroX());
 			//SmartDashboard.putNumber("Ball Roller Encoder", baller.intakeMotor.getPulseWidthPosition());
 			//SmartDashboard.putNumber("Claw Encoder 2", clawPivot.getEncPosition());
 			SmartDashboard.putNumber("POV", driverGamePad.getPOV());

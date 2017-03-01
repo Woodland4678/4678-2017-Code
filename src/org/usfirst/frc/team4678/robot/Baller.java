@@ -18,14 +18,14 @@ public class Baller {
 	
 	//Pivot Motor Constants
 	//Practice bot positions
-//	public static final int INTAKE_PICKUP_HEIGHT = 3300;
-//	public static final int INTAKE_RELEASE_HEIGHT = 1700;
-//	public static final int INTAKE_ENCLOSED_HEIGHT = 1700;
+	public static final int INTAKE_PICKUP_HEIGHT = 3500;
+	public static final int INTAKE_RELEASE_HEIGHT = 2100;
+	public static final int INTAKE_ENCLOSED_HEIGHT = 1700;
 	
 	//Competition bot positions
-	public static final int INTAKE_PICKUP_HEIGHT = 3600;
-	public static final int INTAKE_RELEASE_HEIGHT = 2314;
-	public static final int INTAKE_ENCLOSED_HEIGHT = 1988;
+//	public static final int INTAKE_PICKUP_HEIGHT = 3600;
+//	public static final int INTAKE_RELEASE_HEIGHT = 2314;
+//	public static final int INTAKE_ENCLOSED_HEIGHT = 1988;
 	
 	//Intake Motor Constants
 	public static final int PICKUPSPEED = 20000; //20000
@@ -83,6 +83,7 @@ public class Baller {
 		intakeMotor.set(0);
 	}
 	public void lowerMills(){
+		System.out.println("now in the lowermills function");
 		millState = "lower";
 		canLowerClaw = false;
 		windMillLift.set(0.58); //position (between 0 - 1 I believe)

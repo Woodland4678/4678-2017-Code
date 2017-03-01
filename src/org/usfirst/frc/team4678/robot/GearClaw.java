@@ -12,19 +12,20 @@ public class GearClaw {
 	public DoubleSolenoid clamp;
 	
 	//Practice bot positions
-//	public static final int CLAW_PICKUP_POS = 3930;
-//	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
-//	public static final int CLAW_UP_POS = 3000;
-//	public static final int CLAW_SCORE_POS = 3350;
+	public static final int CLAW_PICKUP_POS = 3930;
+	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
+	public static final int CLAW_UP_POS = 3000;
+	public static final int CLAW_SCORE_POS = 3410;
+	public static final int CLAW_HOLD_POS = 3100;
 	
 	//Competition bot positions
-	public static final int CLAW_PICKUP_POS = 2741;
-	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
-	public static final int CLAW_UP_POS = 1740;
-	public static final int CLAW_SCORE_POS = 2114;
+	//public static final int CLAW_PICKUP_POS = 2741;
+	//public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
+	//public static final int CLAW_UP_POS = 1740;
+	//public static final int CLAW_SCORE_POS = 2114;
 	
 	public static enum states{
-		PICKUP, CLAMP, LIFT, READYTOSCORE ,SCORE, MANUAL
+		PICKUP, CLAMP, LIFT, READYTOSCORE ,SCORE, HOLD, MANUAL
 	}
 
 	public static states currentState = states.MANUAL;
@@ -68,6 +69,10 @@ public class GearClaw {
 		pivotMotor.changeControlMode(TalonControlMode.Position);
 		pivotMotor.set(CLAW_SCORE_POS);
 	}
+	public void hold() {
+		pivotMotor.changeControlMode(TalonControlMode.Position);
+		pivotMotor.set(CLAW_HOLD_POS);
+	}
 	
 	public void stateMachine(){
 			switch(currentState){
@@ -92,9 +97,12 @@ public class GearClaw {
 				canOpenPanel = true; //if we are in ready to score mode the panel is allowed to deploy
 				break;
 			case SCORE:
-				score();
+				//score();
 				extend();
 				canOpenPanel = true; //in score mode the panel is safe to deploy
+				break;
+			case HOLD:
+				hold();
 				break;
 			case MANUAL:
 				
