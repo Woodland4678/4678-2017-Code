@@ -281,7 +281,7 @@ public class DriveTrain {
 		if (rightPercentThere >= 1 && leftPercentThere >= 1) {
 			leftMotor.set(0);
 			rightMotor.set(0);
-			goToDistanceState = 0;
+			goToDistanceState = 0; 
 			//System.out.println("Drivetrain goToDistance at target");
 			//System.out.println("Drivetrain goToDistance final encoder values are "+ getRightEncoder() + ", " + getLeftEncoder());
 			return true;

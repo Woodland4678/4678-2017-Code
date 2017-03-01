@@ -74,7 +74,7 @@ public class Robot extends IterativeRobot {
 	public static final int LEFT_AXISY = 1;
 	public static final int RIGHT_AXISX = 2;
 	public static final int RIGHT_AXISY = 3;
-	public static final int PICKUP_BTN = 4;
+	public static final int PICKUP_BTN = 4; 
 	public static final int CLAMP_BTN = 3;
 	public static final int READY_TO_SCORE_BTN = 2;
 	public static final int PLACE_BTN = 1;

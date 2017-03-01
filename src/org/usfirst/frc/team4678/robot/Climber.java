@@ -16,7 +16,7 @@ public class Climber {
 	public void climbMedium(){
 		climbMotor.set(0.5);
 	}
-	
+	 
 	public void climbSlow(){
 		climbMotor.set(0.2);
 	}

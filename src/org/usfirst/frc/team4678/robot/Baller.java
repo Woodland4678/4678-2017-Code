@@ -19,7 +19,7 @@ public class Baller {
 	//Pivot Motor Constants
 	//Practice bot positions
 	public static final int INTAKE_PICKUP_HEIGHT = 3500;
-	public static final int INTAKE_RELEASE_HEIGHT = 2100;
+	public static final int INTAKE_RELEASE_HEIGHT = 2100; 
 	public static final int INTAKE_ENCLOSED_HEIGHT = 1700;
 	
 	//Competition bot positions

@@ -78,7 +78,7 @@ public class GearClaw {
 			switch(currentState){
 			case PICKUP:
 				canOpenPanel = false; //if we are in pickup mode we cannot deploy the pickup panel
-				pickup();
+				pickup();  
 				extend();
 				break;
 			case CLAMP:
