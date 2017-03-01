@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.VictorSP;
 public class DriveTrain {
 	
 	public static VictorSP leftMotor;
-	public static VictorSP rightMotor; 
+	public static VictorSP rightMotor;  
 	public static Compressor compressor;
 	public static DoubleSolenoid shifter;
 	public static Joystick driveGamePad;

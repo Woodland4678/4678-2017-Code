@@ -46,7 +46,7 @@ public class GearClaw {
 		pivotMotor.changeControlMode(TalonControlMode.Position);
 		pivotMotor.set(3000);
 	}
-	
+	 
 	public void pickup(){
 		pivotMotor.changeControlMode(TalonControlMode.Position);
 		pivotMotor.set(3930);

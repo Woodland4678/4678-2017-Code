@@ -23,7 +23,7 @@ public class Baller {
 	//Intake Motor Constants
 	public static final int PICKUPSPEED = 20000;
 	public static final int RELEASESPEED = -35000;
-	public static CANTalon pivotMotor;
+	public static CANTalon pivotMotor; 
 	public static CANTalon intakeMotor;
 	public static VictorSP agitator;
 	

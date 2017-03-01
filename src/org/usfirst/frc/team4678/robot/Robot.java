@@ -317,7 +317,7 @@ public class Robot extends IterativeRobot {
 			SmartDashboard.putString("Auto Mode", autoModes[autoMode]);
 			
 			
-		}else { 
+		}else {  
 			
 		}
 	}
