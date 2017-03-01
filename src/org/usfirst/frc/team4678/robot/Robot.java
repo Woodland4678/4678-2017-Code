@@ -3,6 +3,7 @@ package org.usfirst.frc.team4678.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import com.ctre.CANTalon;
 
@@ -111,6 +112,11 @@ public class Robot extends IterativeRobot {
 	public static GearClaw claw;
 	public static DriveTrain driveTrain;
 	public static Baller baller;
+	
+	//Camera
+	public static UsbCamera camera;
+	public static PowerDistributionPanel pdp;
+
 	//State Machine Enums
 	//DriveStateMachine
 	
@@ -134,8 +140,10 @@ public class Robot extends IterativeRobot {
 		climber = new Climber(CLIMBERMOTOR);
 		claw = new GearClaw(PCM, CLAWEXTEND, CLAWRETRACT, CLAWPIVOTMOTOR, clawPIDP, clawPIDI, clawPIDD);
 		baller = new Baller(BALLPIVOTMOTOR, BALLROLLERMOTOR);
-		
-		CameraServer.getInstance().startAutomaticCapture(); //Added by Josh working on getting simple vision working (later will be replaced with code on pi, but thought it would be useful for practise)
+		camera = CameraServer.getInstance().startAutomaticCapture(0);
+		camera.setResolution(640, 480);
+		camera.setFPS(30);	
+		pdp = new PowerDistributionPanel(0);
 	}
 	
 	@Override
@@ -190,6 +198,9 @@ public class Robot extends IterativeRobot {
 	/**
 	 * This function is called periodically during operator control
 	 */
+		
+
+	
 	@Override
 	public void teleopInit(){
 		driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE);
@@ -254,7 +265,10 @@ public class Robot extends IterativeRobot {
 			baller.enclose();
 		}
 		if(driverGamePad.getPOV() == 90){
-			baller.release();
+			baller.release(1);
+		}
+		if(driverGamePad.getPOV() == 270){
+			baller.release(-1);
 		}
 		
 		if(operatorGamePad.getPOV() == 0){
@@ -267,6 +281,12 @@ public class Robot extends IterativeRobot {
 			climber.climbStop();
 		}
 		
+		if(driverGamePad.getRawButton(7))
+		{
+			baller.agitate(1);
+		}else if(driverGamePad.getRawButton(8)){
+			baller.agitate(0);
+		}
 	}
 	
 	public void operatorControls(){
@@ -282,8 +302,21 @@ public class Robot extends IterativeRobot {
 			//SmartDashboard.putNumber("Ball Roller Encoder", baller.intakeMotor.getPulseWidthPosition());
 			//SmartDashboard.putNumber("Claw Encoder 2", clawPivot.getEncPosition());
 			SmartDashboard.putNumber("POV", driverGamePad.getPOV());
+			SmartDashboard.putNumber("PDP 0 Current", pdp.getCurrent(0));
+			SmartDashboard.putNumber("PDP 1 Current", pdp.getCurrent(1));
+			SmartDashboard.putNumber("PDP 4 Current", pdp.getCurrent(4));
+			SmartDashboard.putNumber("PDP 10 Current", pdp.getCurrent(10));
+			SmartDashboard.putNumber("PDP 11 Current", pdp.getCurrent(11));
+			SmartDashboard.putNumber("PDP 12 Current", pdp.getCurrent(12));
+			SmartDashboard.putNumber("PDP 13 Current", pdp.getCurrent(13));
+			SmartDashboard.putNumber("PDP 14 Current", pdp.getCurrent(14));
+			SmartDashboard.putNumber("PDP 15 Current", pdp.getCurrent(15));
+			
+			
 
 			SmartDashboard.putString("Auto Mode", autoModes[autoMode]);
+			
+			
 		}else {
 			
 		}

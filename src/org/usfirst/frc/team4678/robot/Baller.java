@@ -2,6 +2,8 @@ package org.usfirst.frc.team4678.robot;
 
 import com.ctre.CANTalon;
 
+import edu.wpi.first.wpilibj.VictorSP;
+
 public class Baller {
 
 	//PID Constants
@@ -15,14 +17,15 @@ public class Baller {
 	
 	//Pivot Motor Constants
 	public static final int PICKUPHEIGHT = 3300;
-	public static final int RELEASEHEIGHT = 1700;
+	public static final int RELEASEHEIGHT = 2000;
 	public static final int ENCLOSEDHEIGHT = 1700;
 	
 	//Intake Motor Constants
 	public static final int PICKUPSPEED = 20000;
-	public static final int RELEASESPEED = -22000;
+	public static final int RELEASESPEED = -35000;
 	public static CANTalon pivotMotor;
 	public static CANTalon intakeMotor;
+	public static VictorSP agitator;
 	
 	public Baller(int pivotMotorID, int intakeMotorID){
 		pivotMotor = new CANTalon(pivotMotorID);
@@ -33,6 +36,7 @@ public class Baller {
 		intakeMotor.setAllowableClosedLoopErr(200);
 		pivotMotor.configMaxOutputVoltage(3);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
+		agitator = new VictorSP(5);
 	}
 	
 	public void pickup(){
@@ -42,18 +46,28 @@ public class Baller {
 		intakeMotor.set(PICKUPSPEED);
 	}
 	
-	public void release(){
+	public void release(int inverse){
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(RELEASEHEIGHT);
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
-		intakeMotor.set(RELEASESPEED);
+		intakeMotor.set(RELEASESPEED*inverse);
 	}
 	
 	public void enclose(){
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
+		
 		pivotMotor.set(ENCLOSEDHEIGHT);
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		intakeMotor.set(0);
+	}
+	
+	public void agitate(int status){
+		if(status == 1){
+			agitator.set(1);
+			System.out.println("DOG");
+		}else{
+			agitator.set(0);
+		}
 	}
 	
 	
