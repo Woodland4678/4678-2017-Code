@@ -46,7 +46,7 @@ public class Robot extends IterativeRobot {
 	public static final int HIGHGEAR = 3;
 	public static final int CLAWRETRACT = 1;
 	public static final int CLAWEXTEND = 0;
-	
+	public static final int HOPPERPNEUMATIC = 4;
 	public static final boolean DEBUG = true;
 	
 	//Controllers
@@ -139,7 +139,7 @@ public class Robot extends IterativeRobot {
 		driveTrain = new DriveTrain(LEFTDRIVEMOTOR, RIGHTDRIVEMOTOR, COMPRESSOR, PCM, HIGHGEAR, LOWGEAR, driverGamePad);
 		climber = new Climber(CLIMBERMOTOR);
 		claw = new GearClaw(PCM, CLAWEXTEND, CLAWRETRACT, CLAWPIVOTMOTOR, clawPIDP, clawPIDI, clawPIDD);
-		baller = new Baller(BALLPIVOTMOTOR, BALLROLLERMOTOR);
+		baller = new Baller(BALLPIVOTMOTOR, BALLROLLERMOTOR, HOPPERPNEUMATIC,  PCM);
 		camera = CameraServer.getInstance().startAutomaticCapture(0);
 		camera.setResolution(640, 480);
 		camera.setFPS(30);	

@@ -2,6 +2,7 @@ package org.usfirst.frc.team4678.robot;
 
 import com.ctre.CANTalon;
 
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.VictorSP;
 
 public class Baller {
@@ -26,8 +27,8 @@ public class Baller {
 	public static CANTalon pivotMotor; 
 	public static CANTalon intakeMotor;
 	public static VictorSP agitator;
-	
-	public Baller(int pivotMotorID, int intakeMotorID){
+	public static Solenoid hopperPneumatic;
+	public Baller(int pivotMotorID, int intakeMotorID, int hopperPCM, int PCMCanID){
 		pivotMotor = new CANTalon(pivotMotorID);
 		intakeMotor = new CANTalon(intakeMotorID);
 		pivotMotor.setPID(pivotP, pivotI, pivotD);
@@ -37,6 +38,7 @@ public class Baller {
 		pivotMotor.configMaxOutputVoltage(3);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
 		agitator = new VictorSP(5);
+		hopperPneumatic = new Solenoid(PCMCanID, hopperPCM);
 	}
 	
 	public void pickup(){
