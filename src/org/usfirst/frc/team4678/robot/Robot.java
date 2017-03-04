@@ -327,6 +327,18 @@ public class Robot extends IterativeRobot {
 				driveTrain.resetGoToDistanceState();
 			}
 		}
+		
+		if(operatorGamePad.getRawButton(12)){
+			driveTrain.ahrs.reset();
+			driveTrain.leftEncoder.reset();
+			driveTrain.rightEncoder.reset();
+		}
+		if(operatorGamePad.getRawButton(11)){
+			driveTrain.pidTurn(90);
+			if(driveTrain.pidTurn.isDone()){
+				driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE);
+			}
+		}
 	}
 
 	public void smartDashboard() {
@@ -334,7 +346,16 @@ public class Robot extends IterativeRobot {
 
 			SmartDashboard.putNumber("Right Encoder", driveTrain.rightEncoder.get());
 			SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
-			SmartDashboard.putNumber("gyro", driveTrain.ahrs.getRawGyroX());
+			SmartDashboard.putNumber("gyro", driveTrain.ahrs.getAngle());
+			SmartDashboard.putNumber("gyro1", driveTrain.ahrs.getAngleAdjustment());
+			SmartDashboard.putNumber("gyro2", driveTrain.ahrs.getRawGyroX());
+			SmartDashboard.putNumber("gyro3", driveTrain.ahrs.getRawGyroZ());
+			SmartDashboard.putNumber("gyro4", driveTrain.ahrs.getRawGyroY());
+			SmartDashboard.putNumber("gyro5", driveTrain.ahrs.getRoll());
+			SmartDashboard.putNumber("gyro6", driveTrain.ahrs.getPitch());
+			SmartDashboard.putNumber("Compass Heading", driveTrain.ahrs.getCompassHeading());
+			
+			
 			SmartDashboard.putNumber("Claw Encoder", claw.pivotMotor.getPulseWidthPosition());
 			SmartDashboard.putNumber("Ball Pivot Encoder", baller.pivotMotor.getPulseWidthPosition());
 			// SmartDashboard.putNumber("Ball Roller Encoder",

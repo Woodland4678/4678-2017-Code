@@ -20,11 +20,27 @@ public class DriveTrain {
 								// is back)
 	public Encoder rightEncoder; // counts down when robot reverses (ball pickup
 									// is back)
+	
+	public static SimPID pidTurn;
+	public static SimPID pidDrive;
 	public static Compressor compressor;
 	public static DoubleSolenoid shifter;
 	public static Joystick driveGamePad;
 	public static final int AXIS = 0; // 0 for Left Joystick on Controller, 2
 										// for Right
+	
+	
+	//PID CONSTANTS
+	public static final double pDrive = 1;
+	public static final double iDrive = 0;
+	public static final double dDrive = 0;
+	public static final double epsDrive = 50;
+	public static final double pTurn = 0.005;
+	public static final double iTurn = 0;
+	public static final double dTurn = 0;
+	public static final double epsTurn = 20;
+	
+	
 	AHRS ahrs;
 	// public static final int AXIS = 0; //0 for Left Joystick on Controller, 2
 	// for Right
@@ -60,7 +76,7 @@ public class DriveTrain {
 		leftMotor = new VictorSP(leftPWM);
 		rightMotor = new VictorSP(rightPWM);
 		ahrs = new AHRS(SPI.Port.kMXP);
-
+		
 		rightEncoder = new Encoder(rightEncChannelA, rightEncChannelB, false, EncodingType.k4X);
 		rightEncoder.setDistancePerPulse(1.0);
 		rightEncoder.setPIDSourceType(PIDSourceType.kRate);
@@ -68,10 +84,15 @@ public class DriveTrain {
 		leftEncoder = new Encoder(leftEncChannelA, leftEncChannelB, false, EncodingType.k4X);
 		leftEncoder.setDistancePerPulse(1.0);
 		leftEncoder.setPIDSourceType(PIDSourceType.kRate);
+		
+		
 		compressor = new Compressor(compressorID);
 		shifter = new DoubleSolenoid(PCMCanID, PCMForwardChannel, PCMReverseChannel);
 		compressor.setClosedLoopControl(true);
 		driveGamePad = gamePad;
+		
+		pidTurn = new SimPID(pTurn, iTurn, iTurn, epsTurn);
+		pidDrive = new SimPID(pDrive, iDrive, dDrive, epsDrive);
 	}
 
 	public void shiftUp() {
@@ -299,5 +320,28 @@ public class DriveTrain {
 
 	public void resetGoToDistanceState() {
 		goToDistanceState = 0;
+	}
+
+	public boolean pidTurn(int angle){
+		setState(DriveTrain.states.AUTO);
+		pidTurn.setDesiredValue(angle);
+		
+		double xVal = pidTurn.calcPID(ahrs.getAngle());
+		double leftDrive = SimLib.calcLeftTankDrive(xVal, 0.0);
+		double rightDrive = SimLib.calcRightTankDrive(xVal, 0.0);
+		leftMotor.set(-leftDrive);
+		rightMotor.set(rightDrive);
+		
+		return pidTurn.isDone();
+	}
+	
+	public boolean pidDrive(int position){
+		pidDrive.setDesiredValue(position);
+		double yVal = pidDrive.calcPID((leftEncoder.get()+rightEncoder.get())/2);
+		double leftDrive = SimLib.calcLeftTankDrive(0, yVal);
+		double rightDrive = SimLib.calcRightTankDrive(0,  yVal);
+		leftMotor.set(-leftDrive);
+		rightMotor.set(rightDrive);
+		return pidDrive.isDone();
 	}
 }

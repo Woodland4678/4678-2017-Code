@@ -9,7 +9,7 @@ public class GearClaw {
 	public static CANTalon pivotMotor;
 	public static DoubleSolenoid clamp;
 	// Practice bot positions
-	public static final int CLAW_PICKUP_POS = 3930;
+	public static final int CLAW_PICKUP_POS = 3900;
 	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
 	public static final int CLAW_UP_POS = 3000;
 	public static final int CLAW_SCORE_POS = 3310;
@@ -34,7 +34,7 @@ public class GearClaw {
 		pivotMotor = new CANTalon(CANTalonID);
 		pivotMotor.setPID(TalonP, TalonI, TalonD);
 		pivotMotor.configMaxOutputVoltage(5);
-		pivotMotor.setAllowableClosedLoopErr(30);
+		pivotMotor.setAllowableClosedLoopErr(10);
 		// clawPivot.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
 		pivotMotor.reverseOutput(false);
