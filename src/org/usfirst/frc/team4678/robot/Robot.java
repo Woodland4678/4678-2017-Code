@@ -43,6 +43,8 @@ public class Robot extends IterativeRobot {
 	public static final int WIND_MILL_LIFT_MOTOR = 4; // pwm 4
 	public static final int PICKUP_PANEL_SERVO_LEFT_ID = 5; // pwm 5
 	public static final int PICKUP_PANEL_SERVO_RIGHT_ID = 6; // pwm 6
+	public static final int SHOOTER_MOTOR = 3;
+	public static final int ELEVATOR_MOTOR = 7; //pwm 7
 	// Pneumatics
 	public static final int PCM = 0;
 	public static final int LOW_GEAR = 2;
@@ -55,6 +57,7 @@ public class Robot extends IterativeRobot {
 	// Controllers
 	public static final int DRIVERGAMEPAD = 0;
 	public static final int OPERATORGAMEPAD = 1;
+	public static final int OPERATOR16BUTTON = 2;
 
 	// PIDConstants
 	// Claw
@@ -87,6 +90,7 @@ public class Robot extends IterativeRobot {
 	// Controllers
 	public static Joystick driverGamePad;
 	public static Joystick operatorGamePad;
+	public static Joystick operator16;
 
 	// Claw
 	public static DoubleSolenoid clawGrabber;
@@ -119,7 +123,7 @@ public class Robot extends IterativeRobot {
 		climber = new Climber(CLIMBER_MOTOR);
 		claw = new GearClaw(PCM, CLAW_EXTEND, CLAW_RETRACT, CLAW_PIVOT_MOTOR, clawPIDP, clawPIDI, clawPIDD);
 		baller = new Baller(BALL_PIVOT_MOTOR, BALL_ROLLER_MOTOR, WIND_MILL_SPIN_MOTOR, WIND_MILL_LIFT_MOTOR,
-				PCM, HOPPER_PNEUMATIC);
+				PCM, HOPPER_PNEUMATIC, SHOOTER_MOTOR, ELEVATOR_MOTOR);
 		camera = CameraServer.getInstance().startAutomaticCapture(0);
 		camera.setResolution(640, 480);
 		camera.setFPS(30);
@@ -207,10 +211,11 @@ public class Robot extends IterativeRobot {
 
 		driverGamePad = new Joystick(DRIVERGAMEPAD);
 		operatorGamePad = new Joystick(OPERATORGAMEPAD);
+		operator16 = new Joystick(OPERATOR16BUTTON);
 	}
 
 	public void driverControls() {
-		System.out.println("Fish");
+		//System.out.println("Fish");
 		if (driverGamePad.getRawButton(SHIFT_DOWN_BTN)) {
 			driveTrain.shiftDown();
 		}
@@ -256,7 +261,13 @@ public class Robot extends IterativeRobot {
 		if(driverGamePad.getRawButton(8)){
 			claw.setState(GearClaw.states.READYTOSCORE);
 
-			
+		}
+		
+		if(operator16.getRawButton(1)) { // Start Shooter
+			baller.shooterStart();
+ 		}
+		if(operator16.getRawButton(2)) { // Stop Shooter
+			baller.shooterStop();
  		}
 
 	}
@@ -286,7 +297,7 @@ public class Robot extends IterativeRobot {
 		if (operatorGamePad.getRawButton(2)) {
 			baller.spinMillIn(); // spins wind mills towards the intake
 		}
-		if (operatorGamePad.getRawButton(5) && claw.getOpenPanelStaus() == true) { // to
+		if (operatorGamePad.getRawButton(5) && claw.getOpenPanelStatus() == true) { // to
 																					// open
 																					// panel
 																					// we

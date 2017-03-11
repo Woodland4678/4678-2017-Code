@@ -17,6 +17,11 @@ public class Baller {
 	public static final double pivotI = 0.001;
 	public static final double pivotD = 0.00;
 
+	// PID Constants
+	public static final double shooterP = 0.05;
+	public static final double shooterI = 0.00;
+	public static final double shooterD = 0.00;
+
 	// Pivot Motor Constants
 	public static final int INTAKE_PICKUP_HEIGHT = 3500;
 	public static final int INTAKE_RELEASE_HEIGHT = 2100;
@@ -26,40 +31,65 @@ public class Baller {
 	// public static final int INTAKE_PICKUP_HEIGHT = 3600;
 	// public static final int INTAKE_RELEASE_HEIGHT = 2314;
 	// public static final int INTAKE_ENCLOSED_HEIGHT = 1988;
-
+	
+	// Windmill Motor Constants
+	public static final double WINDMILLSPINSPEED = 0.9f;
+	public static final double WINDMILL_LOWERED = 0.58; //0-1
+	public static final double WINDMILL_RAISED = 0;
 	public static Servo windMillLift;
 	public static VictorSP windMillSpin; // servos that are controlled by a
 											// victor
-
-	public static Servo pickUpPanelLeft;
-	public static Servo pickUpPanelRight;
 
 	// Intake Motor Constants
 	public static final int PICKUPSPEED = 20000;
 	public static final int RELEASESPEED = -22000;
 	public static CANTalon pivotMotor;
 	public static CANTalon intakeMotor;
+	public static Solenoid hopperPneumatic;	
+
+	// Shooter Motor Constants
+	public static final int SHOOTERSPEED = -1000;
+	public static CANTalon shooterMotor;
+
+	// Elevator Motor Constants
+	public static final double ELEVATORSPEED = -0.8;
+	public static VictorSP elevatorMotor;
+	
+	//Agitator Motor Constants
+	public static final double AGITATORSPEED = -0.5;
 	public static VictorSP agitator;
-	public static Solenoid hopperPneumatic;
+	
+	public static enum IntakeStates {
+		ENCLOSED, PICKUP, RELEASE
+	}
+	
+	public static enum PanelStates {
+		RETRACTED, DEPLOYED
+	}
+	
+	public static enum WindmillStates {
+		RETRACTED, DEPLOYED
+	}
 
 	public static boolean canLowerClaw = true; // used to determine if the claw
 												// can lower and we stay within
 												// the legal limit
-	public static String pickupPosition = "enclosed"; // currently not used for
-														// anything
-	public static String panelState = "retracted"; // keeps track of panel
-													// position used to make
-													// sure the claw is not
-													// deployed while this is
-													// equal to "deployed"
-	public static String millState = "retracted"; // keep track of panel
-													// position used to make
-													// sure the claw is not
-													// deployed while this is
-													// equal to "lower"
+	public static IntakeStates intakeState =
+			IntakeStates.ENCLOSED; // currently not used for anything
+	
+	public static PanelStates panelState =
+			PanelStates.RETRACTED; // keeps track of panel position
+									// used to make sure the claw is not
+									// deployed while this is equal to DEPLOYED
+	
+	public static WindmillStates millState =
+			WindmillStates.RETRACTED; // keep track of panel position
+										// used to make sure the claw is not
+										// deployed while this is equal to
+										// DEPLOYED
 
 	public Baller(int pivotMotorID, int intakeMotorID, int windMillLiftID, int windMillSpinID, int PCMCanID,
-			int hopperPCM) {
+			int hopperPCM, int shooterMotorID, int elevatorMotorID) {
 		pivotMotor = new CANTalon(pivotMotorID);
 		intakeMotor = new CANTalon(intakeMotorID);
 		pivotMotor.setPID(pivotP, pivotI, pivotD);
@@ -72,10 +102,16 @@ public class Baller {
 		hopperPneumatic = new Solenoid(PCMCanID, hopperPCM);
 		windMillLift = new Servo(windMillLiftID);
 		windMillSpin = new VictorSP(windMillSpinID);
+		shooterMotor = new CANTalon(shooterMotorID);
+		shooterMotor.setPID(shooterP, shooterI, shooterD);
+		shooterMotor.setAllowableClosedLoopErr(100);
+		shooterMotor.configMaxOutputVoltage(7);//(10);
+		//shooterMotor.setInverted(true);
+		elevatorMotor = new VictorSP(elevatorMotorID);
 	}
 
 	public void pickup() {
-		pickupPosition = "Pick Up";
+		intakeState = IntakeStates.PICKUP;
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_PICKUP_HEIGHT);
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
@@ -83,7 +119,7 @@ public class Baller {
 	}
 
 	public void release() {
-		pickupPosition = "Release";
+		intakeState = IntakeStates.RELEASE;
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_RELEASE_HEIGHT);
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
@@ -113,43 +149,77 @@ public class Baller {
 		}
 	}
 
+	public void shooterStart() {
+		shooterMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		shooterMotor.set(SHOOTERSPEED);
+		elevatorSpeed(ELEVATORSPEED);
+		
+		//agitator
+		agitator.set(AGITATORSPEED);
+		
+		//intake
+		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
+		pivotMotor.set(INTAKE_RELEASE_HEIGHT);
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(15000);
+	}
+
+	public void shooterStop() {
+		shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		shooterMotor.set(0);
+		elevatorSpeed(0);
+		agitator.set(0);
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(0);
+	}
+	
+	public void elevatorSpeed(double spd) {
+		elevatorMotor.set(spd); // Set the elevator motor speed
+	}
+
+
 	public void hopperRetract() {
+		panelState = PanelStates.RETRACTED;
+		if (millState == WindmillStates.RETRACTED)
+			canLowerClaw = true;
 		hopperPneumatic.set(true);
 
 	}
 
 	public void hopperExtend() {
+		panelState = PanelStates.DEPLOYED;
+		canLowerClaw = false;
 		hopperPneumatic.set(false);
 	}
 
 	public void lowerMills() {
 		System.out.println("now in the lowermills function");
-		millState = "lower";
+		millState = WindmillStates.DEPLOYED;
 		canLowerClaw = false;
-		windMillLift.set(0.58); // position (between 0 - 1 I believe)
+		windMillLift.set(WINDMILL_LOWERED);
 	}
 
 	public void liftMills() {
-		millState = "retracted";
-		if (panelState == "retracted") {
+		millState = WindmillStates.RETRACTED;
+		if (panelState == PanelStates.RETRACTED) {
 			canLowerClaw = true; // if panel closed we can lower the claw
 		}
-		windMillLift.set(0); // position
+		windMillLift.set(WINDMILL_RAISED);
 	}
 
 	public void spinMillOut() {
-		if (millState == "lower") { // only want to spin the wind mills if they
+		if (millState == WindmillStates.DEPLOYED) { // only want to spin the wind mills if they
 									// are deployed
-			windMillSpin.set(0.9); // speed value
+			windMillSpin.set(WINDMILLSPINSPEED); // speed value
 		} else {
 			windMillSpin.disable();
 		}
 	}
 
 	public void spinMillIn() {
-		if (millState == "lower") { // only want to spin the wind mills if they
+		if (millState == WindmillStates.DEPLOYED) { // only want to spin the wind mills if they
 									// are deployed
-			windMillSpin.set(-0.9); // speed value
+			windMillSpin.set(-WINDMILLSPINSPEED); // speed value
 		} else {
 			windMillSpin.disable();
 		}
@@ -165,8 +235,8 @@ public class Baller {
 	} // accessor variable to tell us if we are allowed to lower claw based on
 		// panel position
 
-	public String getPickupPosition() {
-		return pickupPosition;
+	public IntakeStates getIntakePosition() {
+		return intakeState;
 	} // accessor variable to tell us where the ball pickup currently is
 
 }
