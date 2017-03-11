@@ -12,7 +12,7 @@ public class Baller {
 	public static final double intakeP = 0.05;
 	public static final double intakeI = 0.00;
 	public static final double intakeD = 0.00;
-
+	
 	public static final double pivotP = 1.0;
 	public static final double pivotI = 0.001;
 	public static final double pivotD = 0.00;
