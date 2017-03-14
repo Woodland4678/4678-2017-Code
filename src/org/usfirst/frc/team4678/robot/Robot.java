@@ -106,6 +106,7 @@ public class Robot extends IterativeRobot {
 	public static UsbCamera camera;
 	public static PowerDistributionPanel pdp;
 
+	public static boolean oscillate = false;
 	// State Machine Enums
 	// DriveStateMachine
 
@@ -188,10 +189,15 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		driverControls();
+		baller.printShooterSpeed();
 		operatorControls();
+		operatorBTNpadControls();
 		driveTrain.stateMachine();
 		claw.stateMachine();
 		smartDashboard();
+		if (oscillate) {
+			baller.oscillate();
+		}
 	}
 
 	@Override
@@ -246,7 +252,7 @@ public class Robot extends IterativeRobot {
 			baller.stopDown();
 		}
 		if (driverGamePad.getPOV() == 270) {
-			// baller.release(-1);
+			baller.release();
 		}
 
 		if (operatorGamePad.getPOV() == 0) {
@@ -260,18 +266,37 @@ public class Robot extends IterativeRobot {
 		}
 		if(driverGamePad.getRawButton(8)){
 			claw.setState(GearClaw.states.READYTOSCORE);
-
 		}
 		
+	}
+	public void operatorBTNpadControls(){
 		if(operator16.getRawButton(1)) { // Start Shooter
 			baller.shooterStart();
  		}
 		if(operator16.getRawButton(2)) { // Stop Shooter
 			baller.shooterStop();
  		}
-
+		if (operator16.getRawButton(3)) {
+			//baller.hopperExtend();
+			oscillate = true;
+		}
+		if (operator16.getRawButton(4)) {
+			oscillate = false;
+		}
+		if (operator16.getRawButton(16)){
+			baller.lowGoal1();
+		}
+		if (operator16.getRawButton(14)){
+			baller.lowGoal2();
+		}
+		if (operator16.getRawButton(15)){
+			baller.lowGoal3();
+		}
+		if (operator16.getRawButton(10)){
+			baller.lowGoal4();
+		}
+		
 	}
-
 	public void operatorControls() {
 		// System.out.println("HELLO");
 		// if(operatorGamePad.getRawButton(1) && claw.canOpenPanel == true) {
@@ -321,11 +346,11 @@ public class Robot extends IterativeRobot {
 			baller.hopperRetract();
 			System.out.println("deploy is allowed, opening pickup panel!");
 		}
-		System.out.println("Cat");
+		//System.out.println("Cat");
 		
 		if (operatorGamePad.getRawButton(6)) { // always allowed to do this so
 												// no need for extra conditions
-			System.out.println("Dog");
+			//System.out.println("Dog");
 			baller.hopperExtend();
 			SmartDashboard.putNumber("Operator Controls WOrking", 13);
 			
@@ -350,12 +375,14 @@ public class Robot extends IterativeRobot {
 				driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE);
 			}
 		}
+
 	}
 
 	public void smartDashboard() {
 		if (DEBUG) {
 
 			SmartDashboard.putNumber("Right Encoder", driveTrain.rightEncoder.get());
+			SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
 			SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
 			SmartDashboard.putNumber("gyro", driveTrain.ahrs.getAngle());
 			SmartDashboard.putNumber("gyro1", driveTrain.ahrs.getAngleAdjustment());

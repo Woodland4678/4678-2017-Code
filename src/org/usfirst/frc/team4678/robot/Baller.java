@@ -1,6 +1,8 @@
 package org.usfirst.frc.team4678.robot;
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.VictorSP;
@@ -18,9 +20,10 @@ public class Baller {
 	public static final double pivotD = 0.00;
 
 	// PID Constants
-	public static final double shooterP = 0.05;
-	public static final double shooterI = 0.00;
-	public static final double shooterD = 0.00;
+	public static final double shooterP = 1;// 0.025;
+	public static final double shooterI = 0;//0.0001;
+	public static final double shooterD = 0;//0.075;
+	public static final double shooterF = 0;//0.0;
 
 	// Pivot Motor Constants
 	public static final int INTAKE_PICKUP_HEIGHT = 3500;
@@ -48,7 +51,7 @@ public class Baller {
 	public static Solenoid hopperPneumatic;	
 
 	// Shooter Motor Constants
-	public static final int SHOOTERSPEED = -1000;
+	public static final int SHOOTERSPEED =10000;//4200;
 	public static CANTalon shooterMotor;
 
 	// Elevator Motor Constants
@@ -96,16 +99,25 @@ public class Baller {
 		intakeMotor.setPID(intakeP, intakeI, intakeD);
 		pivotMotor.setAllowableClosedLoopErr(30);
 		intakeMotor.setAllowableClosedLoopErr(200);
-		pivotMotor.configMaxOutputVoltage(7);
+		pivotMotor.configMaxOutputVoltage(3);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
 		agitator = new VictorSP(5);
 		hopperPneumatic = new Solenoid(PCMCanID, hopperPCM);
 		windMillLift = new Servo(windMillLiftID);
 		windMillSpin = new VictorSP(windMillSpinID);
 		shooterMotor = new CANTalon(shooterMotorID);
-		shooterMotor.setPID(shooterP, shooterI, shooterD);
-		shooterMotor.setAllowableClosedLoopErr(100);
-		shooterMotor.configMaxOutputVoltage(7);//(10);
+		shooterMotor.changeControlMode(TalonControlMode.Speed);
+		shooterMotor.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		//shooterMotor.configNominalOutputVoltage(0.0f,  -0.0f);
+		shooterMotor.configMaxOutputVoltage(12.0f);
+		//shooterMotor.setProfile(0);
+		//shooterMotor.setPID(shooterP, shooterI, shooterD);
+		shooterMotor.setP(shooterP);
+		shooterMotor.setI(shooterI);
+		shooterMotor.setD(shooterD);
+		//shooterMotor.setF(shooterF);
+		//shooterMotor.setAllowableClosedLoopErr(100);
+		//shooterMotor.configMaxOutputVoltage(12);
 		//shooterMotor.setInverted(true);
 		elevatorMotor = new VictorSP(elevatorMotorID);
 	}
@@ -114,8 +126,10 @@ public class Baller {
 		intakeState = IntakeStates.PICKUP;
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_PICKUP_HEIGHT);
-		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
-		intakeMotor.set(PICKUPSPEED);
+		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		//intakeMotor.set(PICKUPSPEED);
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		intakeMotor.set(0.3);
 	}
 
 	public void release() {
@@ -133,6 +147,26 @@ public class Baller {
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		intakeMotor.set(0);
 	}
+	public void lowGoal1(){
+		System.out.println("fish");
+		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
+		pivotMotor.set(1600);
+	}
+	public void lowGoal2(){
+		hopperRetract();
+	}
+	public void lowGoal3(){
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(-50000);//-15000 for tele
+		pivotMotor.configMaxOutputVoltage(7);
+		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
+		pivotMotor.set(INTAKE_RELEASE_HEIGHT);
+	}
+	public void lowGoal4(){
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(0);
+	}
+	
 	public void stopDown(){
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_PICKUP_HEIGHT);
@@ -143,34 +177,39 @@ public class Baller {
 	public void agitate(int status) {
 		if (status == 1) {
 			agitator.set(1);
-			System.out.println("DOG");
+			//System.out.println("DOG");
 		} else {
 			agitator.set(0);
 		}
 	}
 
 	public void shooterStart() {
-		shooterMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
-		shooterMotor.set(SHOOTERSPEED);
-		elevatorSpeed(ELEVATORSPEED);
+		//shooterMotor.setF(shooterF);
+		shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		shooterMotor.set(1);
+		
+//		shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		shooterMotor.set(1.0);
+		
+		//elevatorSpeed(ELEVATORSPEED);
 		
 		//agitator
-		agitator.set(AGITATORSPEED);
+		//agitator.set(AGITATORSPEED);
 		
 		//intake
-		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
-		pivotMotor.set(INTAKE_RELEASE_HEIGHT);
-		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
-		intakeMotor.set(15000);
+		//pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
+		//pivotMotor.set(INTAKE_RELEASE_HEIGHT);
+		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		//intakeMotor.set(15000);
 	}
 
 	public void shooterStop() {
-		shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		shooterMotor.set(0);
+		//shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		shooterMotor.disable();
 		elevatorSpeed(0);
-		agitator.set(0);
-		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
-		intakeMotor.set(0);
+		agitator.disable();
+		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.disable();
 	}
 	
 	public void elevatorSpeed(double spd) {
@@ -229,6 +268,38 @@ public class Baller {
 	public void stopMills() {
 		windMillSpin.disable();
 	}
+	boolean atEnclosed = false;
+	int cnt = 0;
+	public void printShooterSpeed(){
+//		System.out.println(shooterMotor.getSpeed() + " " + shooterMotor.get() + "VOut=" +shooterMotor.getOutputVoltage()+" AOut=" +shooterMotor.getOutputCurrent());
+//		System.out.println(shooterMotor.getClosedLoopError());
+	}
+	public void oscillate() {
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(0);
+		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
+		if (cnt > 25) {
+			if (cnt > 50) {
+				cnt = 0;
+			}
+			pivotMotor.set(INTAKE_RELEASE_HEIGHT+200);
+		} else {
+			pivotMotor.set(INTAKE_RELEASE_HEIGHT-50);
+		}
+		cnt ++;
+		System.out.println(shooterMotor.getSpeed() + " " + shooterMotor.get());
+		agitator.set(AGITATORSPEED);
+		elevatorSpeed(ELEVATORSPEED);
+//		if(shooterMotor.getSpeed()>=SHOOTERSPEED-4000){
+//			
+//			
+//			elevatorSpeed(ELEVATORSPEED);
+//			//agitator
+//			agitator.set(AGITATORSPEED);
+//		}
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(3000);
+	}
 
 	public boolean getCanLowerClawStatus() {
 		return canLowerClaw;
@@ -238,5 +309,8 @@ public class Baller {
 	public IntakeStates getIntakePosition() {
 		return intakeState;
 	} // accessor variable to tell us where the ball pickup currently is
+	public double getShooterSpeed() {
+		return shooterMotor.getSpeed();
+	}
 
 }

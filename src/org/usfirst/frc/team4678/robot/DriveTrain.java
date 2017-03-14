@@ -327,6 +327,7 @@ public class DriveTrain {
 		pidTurn.setDesiredValue(angle);
 		
 		double xVal = pidTurn.calcPID(ahrs.getAngle());
+		SmartDashboard.putNumber("X Val", xVal);
 		double leftDrive = SimLib.calcLeftTankDrive(xVal, 0.0);
 		double rightDrive = SimLib.calcRightTankDrive(xVal, 0.0);
 		leftMotor.set(-leftDrive);
