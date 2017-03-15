@@ -6,6 +6,7 @@ import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Servo;
 
 public class Baller {
@@ -48,7 +49,7 @@ public class Baller {
 	public static final int RELEASESPEED = -22000;
 	public static CANTalon pivotMotor;
 	public static CANTalon intakeMotor;
-	public static Solenoid hopperPneumatic;	
+	public static DoubleSolenoid hopperPneumatic;	
 
 	// Shooter Motor Constants
 	public static final int SHOOTERSPEED =10000;//4200;
@@ -91,8 +92,8 @@ public class Baller {
 										// deployed while this is equal to
 										// DEPLOYED
 
-	public Baller(int pivotMotorID, int intakeMotorID, int windMillLiftID, int windMillSpinID, int PCMCanID,
-			int hopperPCM, int shooterMotorID, int elevatorMotorID) {
+	public Baller(int pivotMotorID, int intakeMotorID, int windMillLiftID, int windMillSpinID,
+			int PCMCanID, int PCMForwardChannel, int PCMReverseChannel, int shooterMotorID, int elevatorMotorID) {
 		pivotMotor = new CANTalon(pivotMotorID);
 		intakeMotor = new CANTalon(intakeMotorID);
 		pivotMotor.setPID(pivotP, pivotI, pivotD);
@@ -102,7 +103,7 @@ public class Baller {
 		pivotMotor.configMaxOutputVoltage(3);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
 		agitator = new VictorSP(5);
-		hopperPneumatic = new Solenoid(PCMCanID, hopperPCM);
+		hopperPneumatic = new DoubleSolenoid(PCMCanID, PCMForwardChannel, PCMReverseChannel);
 		windMillLift = new Servo(windMillLiftID);
 		windMillSpin = new VictorSP(windMillSpinID);
 		shooterMotor = new CANTalon(shooterMotorID);
@@ -221,14 +222,14 @@ public class Baller {
 		panelState = PanelStates.RETRACTED;
 		if (millState == WindmillStates.RETRACTED)
 			canLowerClaw = true;
-		hopperPneumatic.set(true);
+		hopperPneumatic.set(DoubleSolenoid.Value.kReverse);
 
 	}
 
 	public void hopperExtend() {
 		panelState = PanelStates.DEPLOYED;
 		canLowerClaw = false;
-		hopperPneumatic.set(false);
+		hopperPneumatic.set(DoubleSolenoid.Value.kForward);
 	}
 
 	public void lowerMills() {

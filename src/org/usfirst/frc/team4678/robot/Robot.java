@@ -271,17 +271,17 @@ public class Robot extends IterativeRobot {
 	}
 	public void operatorBTNpadControls(){
 		if(operator16.getRawButton(1)) { // Start Shooter
-			baller.shooterStart();
+			//baller.shooterStart();
  		}
 		if(operator16.getRawButton(2)) { // Stop Shooter
-			baller.shooterStop();
+			//baller.shooterStop();
  		}
 		if (operator16.getRawButton(3)) {
 			//baller.hopperExtend();
-			oscillate = true;
+			//oscillate = true;
 		}
 		if (operator16.getRawButton(4)) {
-			oscillate = false;
+			//oscillate = false;
 		}
 		if (operator16.getRawButton(16)){
 			baller.lowGoal1();
