@@ -17,17 +17,17 @@ public class Baller {
 	public static final double intakeD = 0.00;
 	
 	public static final double pivotP = 1.0;
-	public static final double pivotI = 0.001;
+	public static final double pivotI = 0.0;
 	public static final double pivotD = 0.00;
 
 	// PID Constants
-	public static final double shooterP = 1;// 0.025;
-	public static final double shooterI = 0;//0.0001;
-	public static final double shooterD = 0;//0.075;
-	public static final double shooterF = 0;//0.0;
+	//public static final double shooterP = 1;// 0.025;
+	//public static final double shooterI = 0;//0.0001;
+	//public static final double shooterD = 0;//0.075;
+	//public static final double shooterF = 0;//0.0;
 
 	// Pivot Motor Constants
-	public static final int INTAKE_PICKUP_HEIGHT = 3500;
+	public static final int INTAKE_PICKUP_HEIGHT = 3300;
 	public static final int INTAKE_RELEASE_HEIGHT = 2100;
 	public static final int INTAKE_ENCLOSED_HEIGHT = 1700;
 
@@ -47,17 +47,18 @@ public class Baller {
 	// Intake Motor Constants
 	public static final int PICKUPSPEED = 20000;
 	public static final int RELEASESPEED = -22000;
+	public static final int LOWGOALREVERSE = 15000;
 	public static CANTalon pivotMotor;
 	public static CANTalon intakeMotor;
 	public static DoubleSolenoid hopperPneumatic;	
 
 	// Shooter Motor Constants
-	public static final int SHOOTERSPEED =10000;//4200;
-	public static CANTalon shooterMotor;
+	//public static final int SHOOTERSPEED =10000;//4200;
+	//public static CANTalon shooterMotor;
 
 	// Elevator Motor Constants
-	public static final double ELEVATORSPEED = -0.8;
-	public static VictorSP elevatorMotor;
+	//public static final double ELEVATORSPEED = -0.8;
+	//public static VictorSP elevatorMotor;
 	
 	//Agitator Motor Constants
 	public static final double AGITATORSPEED = -0.5;
@@ -93,34 +94,34 @@ public class Baller {
 										// DEPLOYED
 
 	public Baller(int pivotMotorID, int intakeMotorID, int windMillLiftID, int windMillSpinID,
-			int PCMCanID, int PCMForwardChannel, int PCMReverseChannel, int shooterMotorID, int elevatorMotorID) {
+			int PCMCanID, int PCMForwardChannel, int PCMReverseChannel) {
 		pivotMotor = new CANTalon(pivotMotorID);
 		intakeMotor = new CANTalon(intakeMotorID);
 		pivotMotor.setPID(pivotP, pivotI, pivotD);
 		intakeMotor.setPID(intakeP, intakeI, intakeD);
 		pivotMotor.setAllowableClosedLoopErr(30);
 		intakeMotor.setAllowableClosedLoopErr(200);
-		pivotMotor.configMaxOutputVoltage(3);
+		pivotMotor.configMaxOutputVoltage(7);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
 		agitator = new VictorSP(5);
 		hopperPneumatic = new DoubleSolenoid(PCMCanID, PCMForwardChannel, PCMReverseChannel);
 		windMillLift = new Servo(windMillLiftID);
 		windMillSpin = new VictorSP(windMillSpinID);
-		shooterMotor = new CANTalon(shooterMotorID);
-		shooterMotor.changeControlMode(TalonControlMode.Speed);
-		shooterMotor.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		//shooterMotor = new CANTalon(shooterMotorID);
+		//shooterMotor.changeControlMode(TalonControlMode.Speed);
+		//shooterMotor.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
 		//shooterMotor.configNominalOutputVoltage(0.0f,  -0.0f);
-		shooterMotor.configMaxOutputVoltage(12.0f);
+		//shooterMotor.configMaxOutputVoltage(12.0f);
 		//shooterMotor.setProfile(0);
 		//shooterMotor.setPID(shooterP, shooterI, shooterD);
-		shooterMotor.setP(shooterP);
-		shooterMotor.setI(shooterI);
-		shooterMotor.setD(shooterD);
+		//shooterMotor.setP(shooterP);
+		//shooterMotor.setI(shooterI);
+		//shooterMotor.setD(shooterD);
 		//shooterMotor.setF(shooterF);
 		//shooterMotor.setAllowableClosedLoopErr(100);
 		//shooterMotor.configMaxOutputVoltage(12);
 		//shooterMotor.setInverted(true);
-		elevatorMotor = new VictorSP(elevatorMotorID);
+		//elevatorMotor = new VictorSP(elevatorMotorID);
 	}
 
 	public void pickup() {
@@ -154,18 +155,24 @@ public class Baller {
 		pivotMotor.set(1600);
 	}
 	public void lowGoal2(){
-		hopperRetract();
+		hopperExtend();
 	}
 	public void lowGoal3(){
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
-		intakeMotor.set(-50000);//-15000 for tele
+		intakeMotor.set(-30000);//-15000 for tele
 		pivotMotor.configMaxOutputVoltage(7);
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_RELEASE_HEIGHT);
+		agitate(1);
 	}
 	public void lowGoal4(){
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		intakeMotor.set(0);
+		agitate(0);
+	}
+	public void lowGoal5(){
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(LOWGOALREVERSE);
 	}
 	
 	public void stopDown(){
@@ -175,47 +182,42 @@ public class Baller {
 		intakeMotor.set(0);
 	}
 
-	public void agitate(int status) {
-		if (status == 1) {
-			agitator.set(1);
-			//System.out.println("DOG");
-		} else {
-			agitator.set(0);
-		}
+	public void agitate(double power) {
+		agitator.set(power);
 	}
 
-	public void shooterStart() {
-		//shooterMotor.setF(shooterF);
-		shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		shooterMotor.set(1);
-		
-//		shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		shooterMotor.set(1.0);
-		
-		//elevatorSpeed(ELEVATORSPEED);
-		
-		//agitator
-		//agitator.set(AGITATORSPEED);
-		
-		//intake
-		//pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
-		//pivotMotor.set(INTAKE_RELEASE_HEIGHT);
-		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
-		//intakeMotor.set(15000);
-	}
+//	public void shooterStart() {
+//		//shooterMotor.setF(shooterF);
+//		//shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		//shooterMotor.set(1);
+//		
+////		shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+////		shooterMotor.set(1.0);
+//		
+//		//elevatorSpeed(ELEVATORSPEED);
+//		
+//		//agitator
+//		//agitator.set(AGITATORSPEED);
+//		
+//		//intake
+//		//pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
+//		//pivotMotor.set(INTAKE_RELEASE_HEIGHT);
+//		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+//		//intakeMotor.set(15000);
+//	}
 
-	public void shooterStop() {
-		//shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		shooterMotor.disable();
-		elevatorSpeed(0);
-		agitator.disable();
-		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
-		intakeMotor.disable();
-	}
+//	public void shooterStop() {
+//		//shooterMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		shooterMotor.disable();
+//		elevatorSpeed(0);
+//		agitator.disable();
+//		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+//		intakeMotor.disable();
+	//}
 	
-	public void elevatorSpeed(double spd) {
-		elevatorMotor.set(spd); // Set the elevator motor speed
-	}
+//	public void elevatorSpeed(double spd) {
+	//	elevatorMotor.set(spd); // Set the elevator motor speed
+	//}
 
 
 	public void hopperRetract() {
@@ -271,10 +273,10 @@ public class Baller {
 	}
 	boolean atEnclosed = false;
 	int cnt = 0;
-	public void printShooterSpeed(){
+//	public void printShooterSpeed(){
 //		System.out.println(shooterMotor.getSpeed() + " " + shooterMotor.get() + "VOut=" +shooterMotor.getOutputVoltage()+" AOut=" +shooterMotor.getOutputCurrent());
 //		System.out.println(shooterMotor.getClosedLoopError());
-	}
+//	}
 	public void oscillate() {
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		intakeMotor.set(0);
@@ -288,9 +290,9 @@ public class Baller {
 			pivotMotor.set(INTAKE_RELEASE_HEIGHT-50);
 		}
 		cnt ++;
-		System.out.println(shooterMotor.getSpeed() + " " + shooterMotor.get());
+//		System.out.println(shooterMotor.getSpeed() + " " + shooterMotor.get());
 		agitator.set(AGITATORSPEED);
-		elevatorSpeed(ELEVATORSPEED);
+//		elevatorSpeed(ELEVATORSPEED);
 //		if(shooterMotor.getSpeed()>=SHOOTERSPEED-4000){
 //			
 //			
@@ -310,8 +312,8 @@ public class Baller {
 	public IntakeStates getIntakePosition() {
 		return intakeState;
 	} // accessor variable to tell us where the ball pickup currently is
-	public double getShooterSpeed() {
-		return shooterMotor.getSpeed();
-	}
+//	public double getShooterSpeed() {
+//		return shooterMotor.getSpeed();
+//	}
 
 }

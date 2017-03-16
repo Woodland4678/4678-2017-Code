@@ -43,15 +43,16 @@ public class Robot extends IterativeRobot {
 	public static final int WIND_MILL_LIFT_MOTOR = 4; // pwm 4
 	public static final int PICKUP_PANEL_SERVO_LEFT_ID = 5; // pwm 5
 	public static final int PICKUP_PANEL_SERVO_RIGHT_ID = 6; // pwm 6
-	public static final int SHOOTER_MOTOR = 3;
-	public static final int ELEVATOR_MOTOR = 7; //pwm 7
+	//public static final int SHOOTER_MOTOR = 3;
+	//public static final int ELEVATOR_MOTOR = 7; //pwm 7
 	// Pneumatics
 	public static final int PCM = 0;
 	public static final int LOW_GEAR = 2;
 	public static final int HIGH_GEAR = 3;
 	public static final int CLAW_RETRACT = 1;
 	public static final int CLAW_EXTEND = 0;
-	public static final int HOPPER_PNEUMATIC = 4;
+	public static final int HOPPER_OPEN = 4;
+	public static final int HOPPER_CLOSE = 5;
 	public static final boolean DEBUG = true;
 
 	// Controllers
@@ -124,7 +125,7 @@ public class Robot extends IterativeRobot {
 		climber = new Climber(CLIMBER_MOTOR);
 		claw = new GearClaw(PCM, CLAW_EXTEND, CLAW_RETRACT, CLAW_PIVOT_MOTOR, clawPIDP, clawPIDI, clawPIDD);
 		baller = new Baller(BALL_PIVOT_MOTOR, BALL_ROLLER_MOTOR, WIND_MILL_SPIN_MOTOR, WIND_MILL_LIFT_MOTOR,
-				PCM, HOPPER_PNEUMATIC, SHOOTER_MOTOR, ELEVATOR_MOTOR);
+				PCM, HOPPER_OPEN,HOPPER_CLOSE );// SHOOTER_MOTOR, ELEVATOR_MOTOR);
 		camera = CameraServer.getInstance().startAutomaticCapture(0);
 		camera.setResolution(640, 480);
 		camera.setFPS(30);
@@ -189,7 +190,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		driverControls();
-		baller.printShooterSpeed();
+		//baller.printShooterSpeed();
 		operatorControls();
 		operatorBTNpadControls();
 		driveTrain.stateMachine();
@@ -295,7 +296,9 @@ public class Robot extends IterativeRobot {
 		if (operator16.getRawButton(10)){
 			baller.lowGoal4();
 		}
-		
+		if (operator16.getRawButton(13)){
+			baller.lowGoal5();
+		}
 	}
 	public void operatorControls() {
 		// System.out.println("HELLO");
@@ -382,7 +385,7 @@ public class Robot extends IterativeRobot {
 		if (DEBUG) {
 
 			SmartDashboard.putNumber("Right Encoder", driveTrain.rightEncoder.get());
-			SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
+			//SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
 			SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
 			SmartDashboard.putNumber("gyro", driveTrain.ahrs.getAngle());
 			SmartDashboard.putNumber("gyro1", driveTrain.ahrs.getAngleAdjustment());
