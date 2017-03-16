@@ -12,7 +12,7 @@ public class GearClaw {
 	public static final int CLAW_PICKUP_POS = 3780;
 	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
 	public static final int CLAW_UP_POS = 2850;
-	public static final int CLAW_SCORE_POS = 3175;
+	public static final int CLAW_SCORE_POS = 3150;
 	public static final int CLAW_HOLD_POS = 2950;
 
 	// Competition bot positions

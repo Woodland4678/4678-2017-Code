@@ -196,9 +196,9 @@ public class Robot extends IterativeRobot {
 		driveTrain.stateMachine();
 		claw.stateMachine();
 		smartDashboard();
-		if (oscillate) {
-			baller.oscillate();
-		}
+//		if (oscillate) {
+//			baller.oscillate();
+//		}
 	}
 
 	@Override
@@ -285,19 +285,19 @@ public class Robot extends IterativeRobot {
 			//oscillate = false;
 		}
 		if (operator16.getRawButton(16)){
-			baller.lowGoal1();
+			baller.lowGoalReady();
 		}
 		if (operator16.getRawButton(14)){
-			baller.lowGoal2();
+			baller.lowGoalHopper();
 		}
 		if (operator16.getRawButton(15)){
-			baller.lowGoal3();
+			baller.lowGoalShoot();
 		}
 		if (operator16.getRawButton(10)){
-			baller.lowGoal4();
+			baller.lowGoalReverse();
 		}
 		if (operator16.getRawButton(13)){
-			baller.lowGoal5();
+			baller.lowGoalStop();
 		}
 	}
 	public void operatorControls() {
