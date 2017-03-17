@@ -330,13 +330,10 @@ public class DriveTrain {
 		SmartDashboard.putNumber("X Val", xVal);
 		double leftDrive = SimLib.calcLeftTankDrive(xVal, 0.0);
 		double rightDrive = SimLib.calcRightTankDrive(xVal, 0.0);
-		if(pidTurn.isDone()){
-			leftMotor.set(0);
-			rightMotor.set(0);
-		}else{
+		
 			leftMotor.set(-leftDrive);
 			rightMotor.set(rightDrive);
-		}
+
 		
 		SmartDashboard.putBoolean("Turn isDone", pidTurn.isDone());
 		return pidTurn.isDone();

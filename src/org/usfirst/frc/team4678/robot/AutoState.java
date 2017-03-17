@@ -8,8 +8,11 @@ public class AutoState {
 	public Baller.PanelStates desiredPanelState;
 	public Baller.WindmillStates desiredWindmillState;
 	public Robot robot;
-
-	public AutoState(int driveEncoder, int gyroAngle, GearClaw.states gearState, Robot crobot){
+	public int iterations = 0;
+	public int minIterations = 0;
+	
+	
+	public AutoState(int driveEncoder, int gyroAngle, GearClaw.states gearState, int minimumIterations, Robot crobot){
 		desiredDriveEncoderVal = driveEncoder;
 		desiredAngle = gyroAngle;
 		desiredGearState = gearState;
@@ -17,15 +20,24 @@ public class AutoState {
 		//desiredPanelState = panelState;
 		//desiredWindmillState = windmillState;
 		robot = crobot;
+		iterations = 0;
+		minIterations = minimumIterations;
 	}
 	
 	public void runState(){
+		if(iterations == 0){
+			resetSensors();
+			robot.driveTrain.leftMotor.set(0);
+			robot.driveTrain.rightMotor.set(0);
+		}
+		iterations++;
 		if(desiredDriveEncoderVal == 0 && desiredAngle != 0){
 			robot.driveTrain.pidTurn(desiredAngle);
 		}else if(desiredAngle == 0 && desiredDriveEncoderVal != 0){
 			robot.driveTrain.pidDrive(desiredDriveEncoderVal);
-		}else{
-			
+		}else if(desiredDriveEncoderVal == 0 && desiredAngle == 0){
+			robot.driveTrain.leftMotor.set(0);
+			robot.driveTrain.rightMotor.set(0);
 		}
 		robot.claw.setState(desiredGearState);
 		robot.claw.stateMachine();
@@ -36,15 +48,16 @@ public class AutoState {
 		boolean driveDone = false;
 		boolean turnDone = false;
 		boolean gearDone = false;
+		boolean iterationsDone = false;
 		if(desiredDriveEncoderVal == 0){
-			if(robot.driveTrain.pidTurn.isDone()){
+			if(robot.driveTrain.pidTurn.isDone() && iterations > 5){
 				turnDone = true;
 				driveDone = true;
 			}
 		}
 		
 		if(desiredAngle == 0){
-			if(robot.driveTrain.pidDrive.isDone()){
+			if(robot.driveTrain.pidDrive.isDone() && iterations > 5){
 				turnDone = true;
 				driveDone = true;
 			}
@@ -53,11 +66,21 @@ public class AutoState {
 		if(robot.claw.currentState == desiredGearState){
 			gearDone = true;
 		}
-		if(driveDone && turnDone && gearDone){
+		
+		if(iterations >= minIterations){
+			iterationsDone = true;
+		}
+		if(driveDone && turnDone && gearDone && iterationsDone){
 			return true;
 		}else{
 			return false;
 		}
+	}
+	
+	public void resetSensors(){
+		robot.driveTrain.leftEncoder.reset();
+		robot.driveTrain.rightEncoder.reset();
+		robot.driveTrain.ahrs.reset();
 	}
 	
 }
