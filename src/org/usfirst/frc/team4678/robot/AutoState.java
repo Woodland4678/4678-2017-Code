@@ -20,14 +20,15 @@ public class AutoState {
 	}
 	
 	public void runState(){
-		if(desiredDriveEncoderVal == 0){
+		if(desiredDriveEncoderVal == 0 && desiredAngle != 0){
 			robot.driveTrain.pidTurn(desiredAngle);
-		}else if(desiredAngle == 0){
+		}else if(desiredAngle == 0 && desiredDriveEncoderVal != 0){
 			robot.driveTrain.pidDrive(desiredDriveEncoderVal);
 		}else{
 			
 		}
 		robot.claw.setState(desiredGearState);
+		robot.claw.stateMachine();
 		
 	}
 	

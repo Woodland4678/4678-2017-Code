@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import com.ctre.CANTalon;
-
+import java.util.*;
 import edu.wpi.first.wpilibj.CameraServer;
 
 /**
@@ -45,6 +45,12 @@ public class Robot extends IterativeRobot {
 	public static final int PICKUP_PANEL_SERVO_RIGHT_ID = 6; // pwm 6
 	//public static final int SHOOTER_MOTOR = 3;
 	//public static final int ELEVATOR_MOTOR = 7; //pwm 7
+	
+	
+	public static final int gearSensor1 = 2;
+	public static final int gearSensor2 = 3;
+	
+	
 	// Pneumatics
 	public static final int PCM = 0;
 	public static final int LOW_GEAR = 2;
@@ -116,25 +122,46 @@ public class Robot extends IterativeRobot {
 	 * used for any initialization code.
 	 */
 	public static int autoMode = 0;
+	
 
+	public static AutoState middleGearAutoState1;
+	public static AutoState middleGearAutoState2;
+	public static AutoState middleGearAutoState3;
+	public static ArrayList<AutoState> middleGearAutoArrayList;
+	public static AutoMode middleGearAuto;
+	
+	
+	public void autoModeAssemble(){
+		middleGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, this);
+		middleGearAutoState2 = new AutoState(0,0,GearClaw.states.READYTOSCORE, this);
+		middleGearAutoState3 = new AutoState(0,0,GearClaw.states.SCORE, this);
+		middleGearAutoArrayList = new ArrayList<AutoState>();
+		middleGearAutoArrayList.add(middleGearAutoState1);
+		middleGearAutoArrayList.add(middleGearAutoState2);
+		middleGearAutoArrayList.add(middleGearAutoState3);
+		middleGearAuto = new AutoMode(middleGearAutoArrayList);
+	}
+	
 	@Override
 	public void robotInit() {
 		controllerInit();
 		driveTrain = new DriveTrain(LEFT_DRIVE_MOTOR, RIGHT_DRIVE_MOTOR, COMPRESSOR, PCM, HIGH_GEAR, LOW_GEAR,
 				driverGamePad, RIGHT_ENC_CHANNEL_A, RIGHT_ENC_CHANNEL_B, LEFT_ENC_CHANNEL_A, LEFT_ENC_CHANNEL_B);
 		climber = new Climber(CLIMBER_MOTOR);
-		claw = new GearClaw(PCM, CLAW_EXTEND, CLAW_RETRACT, CLAW_PIVOT_MOTOR, clawPIDP, clawPIDI, clawPIDD);
+		claw = new GearClaw(PCM, CLAW_EXTEND, CLAW_RETRACT, CLAW_PIVOT_MOTOR, clawPIDP, clawPIDI, clawPIDD, gearSensor1, gearSensor2);
 		baller = new Baller(BALL_PIVOT_MOTOR, BALL_ROLLER_MOTOR, WIND_MILL_SPIN_MOTOR, WIND_MILL_LIFT_MOTOR,
 				PCM, HOPPER_OPEN,HOPPER_CLOSE );// SHOOTER_MOTOR, ELEVATOR_MOTOR);
 		camera = CameraServer.getInstance().startAutomaticCapture(0);
 		camera.setResolution(640, 480);
 		camera.setFPS(30);
 		pdp = new PowerDistributionPanel(0);
+		autoModeAssemble();
+		
 	}
-
+	
 	@Override
 	public void autonomousInit() {
-
+		middleGearAuto.currentState = 0;
 	}
 
 	/**
@@ -175,7 +202,12 @@ public class Robot extends IterativeRobot {
 		if (operatorGamePad.getRawButton(10)) {
 			autoMode = 10;
 		}
-
+		
+		SmartDashboard.putNumber("Right Encoder", driveTrain.rightEncoder.get());
+		//SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
+		SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
+		SmartDashboard.putNumber("Auto State", middleGearAuto.currentState);
+		middleGearAuto.runMode();
 	}
 
 	/**
@@ -204,6 +236,10 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledPeriodic() {
 		smartDashboard();
+		SmartDashboard.putNumber("Gear Left", claw.gearLeft.getValue());
+		SmartDashboard.putNumber("Gear Right", claw.gearRight.getValue());
+		
+		SmartDashboard.putNumber("Gear Voltage", claw.gearLeft.getAverageVoltage());
 	}
 
 	/**
@@ -268,6 +304,8 @@ public class Robot extends IterativeRobot {
 		if(driverGamePad.getRawButton(8)){
 			claw.setState(GearClaw.states.READYTOSCORE);
 		}
+		
+		
 		
 	}
 	public void operatorBTNpadControls(){
@@ -373,10 +411,8 @@ public class Robot extends IterativeRobot {
 			driveTrain.rightEncoder.reset();
 		}
 		if(operatorGamePad.getRawButton(11)){
-			driveTrain.pidTurn(90);
-			if(driveTrain.pidTurn.isDone()){
-				driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE);
-			}
+			claw.setState(GearClaw.states.LIFT);
+
 		}
 
 	}
@@ -388,14 +424,6 @@ public class Robot extends IterativeRobot {
 			//SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
 			SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
 			SmartDashboard.putNumber("gyro", driveTrain.ahrs.getAngle());
-			SmartDashboard.putNumber("gyro1", driveTrain.ahrs.getAngleAdjustment());
-			SmartDashboard.putNumber("gyro2", driveTrain.ahrs.getRawGyroX());
-			SmartDashboard.putNumber("gyro3", driveTrain.ahrs.getRawGyroZ());
-			SmartDashboard.putNumber("gyro4", driveTrain.ahrs.getRawGyroY());
-			SmartDashboard.putNumber("gyro5", driveTrain.ahrs.getRoll());
-			SmartDashboard.putNumber("gyro6", driveTrain.ahrs.getPitch());
-			SmartDashboard.putNumber("Compass Heading", driveTrain.ahrs.getCompassHeading());
-			
 			
 			SmartDashboard.putNumber("Claw Encoder", claw.pivotMotor.getPulseWidthPosition());
 			SmartDashboard.putNumber("Ball Pivot Encoder", baller.pivotMotor.getPulseWidthPosition());
@@ -403,16 +431,11 @@ public class Robot extends IterativeRobot {
 			// baller.intakeMotor.getPulseWidthPosition());
 			// SmartDashboard.putNumber("Claw Encoder 2",
 			// clawPivot.getEncPosition());
-			SmartDashboard.putNumber("POV", driverGamePad.getPOV());
-			SmartDashboard.putNumber("PDP 0 Current", pdp.getCurrent(0));
-			SmartDashboard.putNumber("PDP 1 Current", pdp.getCurrent(1));
-			SmartDashboard.putNumber("PDP 4 Current", pdp.getCurrent(4));
-			SmartDashboard.putNumber("PDP 10 Current", pdp.getCurrent(10));
-			SmartDashboard.putNumber("PDP 11 Current", pdp.getCurrent(11));
-			SmartDashboard.putNumber("PDP 12 Current", pdp.getCurrent(12));
-			SmartDashboard.putNumber("PDP 13 Current", pdp.getCurrent(13));
-			SmartDashboard.putNumber("PDP 14 Current", pdp.getCurrent(14));
-			SmartDashboard.putNumber("PDP 15 Current", pdp.getCurrent(15));
+			
+			SmartDashboard.putNumber("Gear Left", claw.gearLeft.getValue());
+			SmartDashboard.putNumber("Gear Right", claw.gearRight.getValue());
+			
+			SmartDashboard.putNumber("Gear Voltage", claw.gearLeft.getAverageVoltage());
 			
 			SmartDashboard.putString("Auto Mode", autoModes[autoMode]);
 

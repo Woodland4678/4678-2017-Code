@@ -12,11 +12,18 @@ public class AutoMode {
 	}
 	
 	public void runMode(){
-		autoStates.get(currentState).runState();
+		
 		if(autoStates.get(currentState).isStateDone()){
 			if(currentState < ((autoStates.size()) -1)){
 				currentState++;
+			}else{
+				autoStates.get(currentState).robot.driveTrain.leftMotor.set(0);
+				autoStates.get(currentState).robot.driveTrain.rightMotor.set(0);
+				
 			}
+			
+		}else{
+			autoStates.get(currentState).runState();
 		}
 	}
 }

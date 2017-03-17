@@ -8,12 +8,17 @@ import com.ctre.CANTalon.*;
 public class GearClaw {
 	public static CANTalon pivotMotor;
 	public static DoubleSolenoid clamp;
+	public static AnalogInput gearLeft;
+	public static AnalogInput gearRight;
 	// Practice bot positions
 	public static final int CLAW_PICKUP_POS = 3780;
 	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
 	public static final int CLAW_UP_POS = 2850;
 	public static final int CLAW_SCORE_POS = 3150;
 	public static final int CLAW_HOLD_POS = 2950;
+	public static int lastGearLeftVal = 0;
+	public static int lastGearRightVal = 0;
+	public static int iterator = 0;
 
 	// Competition bot positions
 	// public static final int CLAW_PICKUP_POS = 2741;
@@ -29,7 +34,7 @@ public class GearClaw {
 										// open the pickup panel
 
 	public GearClaw(int PCMCanID, int PCMForwardChannel, int PCMReverseChannel, int CANTalonID, double TalonP,
-			double TalonI, double TalonD) {
+			double TalonI, double TalonD, int gearSensor1, int gearSensor2) {
 		clamp = new DoubleSolenoid(PCMCanID, PCMForwardChannel, PCMReverseChannel);
 		pivotMotor = new CANTalon(CANTalonID);
 		pivotMotor.setPID(TalonP, TalonI, TalonD);
@@ -38,6 +43,9 @@ public class GearClaw {
 		// clawPivot.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
 		pivotMotor.reverseOutput(false);
+		
+		gearLeft = new AnalogInput(gearSensor1);
+		gearRight = new AnalogInput(gearSensor2);
 	}
 
 	public void extend() {
@@ -79,17 +87,19 @@ public class GearClaw {
 	}
 
 	public void stateMachine() {
+		
+		
 		switch (currentState) {
 		case PICKUP:
 			canOpenPanel = false; // if we are in pickup mode we cannot deploy
-									// the pickup panel
+			this.autoGearClamp();						// the pickup panel
 			pickup();
 
 			extend();
 			break;
 		case CLAMP:
 			canOpenPanel = false; // if we are in clamp mode we cannot deploy
-									// the pickup panel
+			waitThenClamp();						// the pickup panel
 			down();
 			retract();
 			break;
@@ -120,13 +130,37 @@ public class GearClaw {
 		}
 
 	}
-
+	public void autoGearClamp(){
+		if(lastGearLeftVal > 1100 && gearLeft.getValue() < 800 ){
+			this.setState(GearClaw.states.CLAMP);
+			
+			iterator = 0;
+			//this.setState(GearClaw.states.LIFT);
+		}
+		
+		if(lastGearRightVal > 1100 && gearRight.getValue() <800){
+	this.setState(GearClaw.states.CLAMP);
+			
+			iterator = 0;
+		}
+		
+		lastGearLeftVal = gearLeft.getValue();
+		lastGearRightVal = gearRight.getValue();
+	}
 	public void setState(states newState) {
 		currentState = newState;
 	}
 
 	public boolean getOpenPanelStatus() {
 		return canOpenPanel;
+	}
+	
+	public void waitThenClamp(){
+		iterator++;
+		if(iterator == 13){
+			this.setState(GearClaw.states.LIFT);
+			iterator = 1000;
+		}
 	}
 
 }

@@ -31,14 +31,14 @@ public class DriveTrain {
 	
 	
 	//PID CONSTANTS
-	public static final double pDrive = 1;
-	public static final double iDrive = 0;
-	public static final double dDrive = 0;
+	public static final double pDrive = 0.03;
+	public static final double iDrive = 0.0075;
+	public static final double dDrive = 0.02;
 	public static final double epsDrive = 50;
-	public static final double pTurn = 0.005;
+	public static final double pTurn = 0.05;
 	public static final double iTurn = 0;
-	public static final double dTurn = 0;
-	public static final double epsTurn = 20;
+	public static final double dTurn = 0.02;
+	public static final double epsTurn = 2;
 	
 	
 	AHRS ahrs;
@@ -330,19 +330,34 @@ public class DriveTrain {
 		SmartDashboard.putNumber("X Val", xVal);
 		double leftDrive = SimLib.calcLeftTankDrive(xVal, 0.0);
 		double rightDrive = SimLib.calcRightTankDrive(xVal, 0.0);
-		leftMotor.set(-leftDrive);
-		rightMotor.set(rightDrive);
+		if(pidTurn.isDone()){
+			leftMotor.set(0);
+			rightMotor.set(0);
+		}else{
+			leftMotor.set(-leftDrive);
+			rightMotor.set(rightDrive);
+		}
 		
+		SmartDashboard.putBoolean("Turn isDone", pidTurn.isDone());
 		return pidTurn.isDone();
 	}
 	
 	public boolean pidDrive(int position){
+		setState(DriveTrain.states.AUTO);
 		pidDrive.setDesiredValue(position);
 		double yVal = pidDrive.calcPID((leftEncoder.get()+rightEncoder.get())/2);
 		double leftDrive = SimLib.calcLeftTankDrive(0, yVal);
 		double rightDrive = SimLib.calcRightTankDrive(0,  yVal);
-		leftMotor.set(-leftDrive);
-		rightMotor.set(rightDrive);
+		
+		if(pidDrive.isDone()){
+			leftMotor.set(0);
+			rightMotor.set(0);
+		}else{
+			leftMotor.set(leftDrive);
+			rightMotor.set(-rightDrive);
+		}
+		
+		SmartDashboard.putBoolean("Drive isDone", pidTurn.isDone());
 		return pidDrive.isDone();
 	}
 }
