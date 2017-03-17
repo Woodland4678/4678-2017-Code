@@ -59,7 +59,7 @@ public class DriveTrain {
 	double leftMotorMultiplier;
 	double rightMotorMultiplier;
 	double encoderClicksPerCentimeter = 7.2;
-	double GO_TO_DISTANCE_CORRECTION_SPEED = 50;
+	double GO_TO_DISTANCE_CORRECTION_SPEED = 1.0;
 	double powerOffset;
 	double leftPower = 0;
 	double rightPower = 0;
@@ -171,8 +171,6 @@ public class DriveTrain {
 			// ", " + getLeftEncoder());
 		}
 
-		System.out.println(
-				"hi goToDistanceState=" + goToDistanceState + " " + startingLeftDistance + " " + startingRightDistance);
 
 		// --------------------------------------------------------------------------
 		// ---------------------Get target and current
@@ -185,6 +183,8 @@ public class DriveTrain {
 		targetRight = rightCentimeters * encoderClicksPerCentimeter; // used to
 																		// be
 																		// parameters
+		System.out.println(
+				"hi goToDistanceState=" + goToDistanceState + " " + startingLeftDistance + " " + startingRightDistance + " tleft="+targetLeft+" tright="+targetRight);
 
 		// Get the current distance in centimeters
 		currentLeft = Math.abs(leftEncoder.get() - startingLeftDistance);
@@ -205,8 +205,8 @@ public class DriveTrain {
 		// Find the percentage the left and right are to their target
 		leftPercentThere = Math.abs(currentLeft / targetLeft);
 		rightPercentThere = Math.abs(currentRight / targetRight);
-		// Robot.logger.debug("Drivetrain", "gpToDistance Percentages At " +
-		// rightPercentThere + ", " + leftPercentThere);
+		System.out.println("Percentages At " + leftPercentThere + ", " + rightPercentThere+" CurrentLeft="+currentLeft+" CurrentRight"+currentRight);
+		System.out.println("Leftcm="+currentLeftCentimeters+" Rightcm="+currentRightCentimeters);
 
 		// Initially set the powers to their default values
 		leftMotorMultiplier = 1;
@@ -237,9 +237,7 @@ public class DriveTrain {
 				rightMotorMultiplier *= 1 + powerOffset;
 			}
 		}
-		// Robot.logger.debug("Drivetrain", "goToDistance percentages at " +
-		// (int)(rightPercentThere * 100) + ", " + (int)(leftPercentThere * 100)
-		// + " Power Offset At " + (((int)(1000 * powerOffset)) / 1000.0));
+		System.out.println("percentages at " + (int)(leftPercentThere * 100) + ", " + (int)(rightPercentThere * 100) + " Power Offset At " + (((int)(1000 * powerOffset)) / 1000.0));
 		// --------------------------------------------------------------------------
 		// -----------------------Flip the powers if
 		// necessary-----------------------
@@ -297,6 +295,7 @@ public class DriveTrain {
 		// (-(int)((getLeftEncoder() - startingLeftDistance) /
 		// Robot.encoderClicksPerCentimeter())));
 
+		System.out.println("Left Power = "+leftMotorMultiplier * power * rampDownPercentage+" Right Power = "+rightMotorMultiplier * power * rampDownPercentage);
 		leftMotor.set(leftMotorMultiplier * power * rampDownPercentage);
 		rightMotor.set(rightMotorMultiplier * power * rampDownPercentage);
 

@@ -350,12 +350,18 @@ public class Robot extends IterativeRobot {
 		
 	}
 	public void operatorBTNpadControls(){
-		if(operator16.getRawButton(1)) { // Start Shooter
-			//baller.shooterStart();
+		if(operator16.getRawButton(1)) { // reset GotoDistance code
+			driveTrain.resetGoToDistanceState();
  		}
-		if(operator16.getRawButton(2)) { // Stop Shooter
-			//baller.shooterStop();
+		if(operator16.getRawButton(2)) { // Test goto distance code
+			driveTrain.setState(DriveTrain.states.AUTO); // Disable the joystick drive control
+			driveTrain.goToDistance(200, 200, 0.75, 15, 25, 0.50, 0.50); // rightCentimeters, leftCentimeters, power, rampUpDistance,
+			// rampDownDistance, startingPower, endingPower
  		}
+		else if (DriveTrain.currentState == DriveTrain.states.AUTO)
+		{
+			driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE); // back to JOYSTICK when we let go of the button
+		}
 		if (operator16.getRawButton(3)) {
 			//baller.hopperExtend();
 			//oscillate = true;

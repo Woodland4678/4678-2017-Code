@@ -86,7 +86,7 @@ public class GearClaw {
 
 	}
 
-	public void stateMachine() {
+	public void stateMachine() { // called by Robot.java at 50Hz
 		
 		
 		switch (currentState) {
