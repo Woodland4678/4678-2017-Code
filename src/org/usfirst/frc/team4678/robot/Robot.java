@@ -150,7 +150,7 @@ public class Robot extends IterativeRobot {
 	
 	public void autoModeAssemble(){
 		middleGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
-		middleGearAutoState2 = new AutoState(5800,0,GearClaw.states.READYTOSCORE,0, this);
+		middleGearAutoState2 = new AutoState(6000,0,GearClaw.states.READYTOSCORE,0, this);
 		middleGearAutoState3 = new AutoState(0,0,GearClaw.states.SCORE,0, this);
 		middleGearAutoArrayList = new ArrayList<AutoState>();
 		middleGearAutoArrayList.add(middleGearAutoState1);
@@ -207,6 +207,7 @@ public class Robot extends IterativeRobot {
 		resetSensors();
 		rightGearAuto.currentState = 0;
 		smartDashboard();
+	
 		
 		
 	}
@@ -262,8 +263,9 @@ public class Robot extends IterativeRobot {
 		//SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
 		SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
 		SmartDashboard.putNumber("Auto State", rightGearAuto.currentState);
-		leftGearAuto.runMode();
+		middleGearAuto.runMode();
 		//driveTrain.pidTurn(90);
+		//driveTrain.pidEncTurn(500);
 	}
 
 	/**

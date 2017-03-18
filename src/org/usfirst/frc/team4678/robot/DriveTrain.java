@@ -23,6 +23,7 @@ public class DriveTrain {
 	
 	public static SimPID pidTurn;
 	public static SimPID pidDrive;
+	public static SimPID encPidTurn;
 	public static Compressor compressor;
 	public static DoubleSolenoid shifter;
 	public static Joystick driveGamePad;
@@ -39,6 +40,11 @@ public class DriveTrain {
 	public static final double iTurn = 0;
 	public static final double dTurn = 0.018;
 	public static final double epsTurn = 3;
+	
+	public static final double pEncTurn = 0.05;
+	public static final double iEncTurn = 0;
+	public static final double dEncTurn = 0;
+	public static final double epsEncTurn = 100;
 	
 	
 	AHRS ahrs;
@@ -93,6 +99,7 @@ public class DriveTrain {
 		
 		pidTurn = new SimPID(pTurn, iTurn, iTurn, epsTurn);
 		pidDrive = new SimPID(pDrive, iDrive, dDrive, epsDrive);
+		encPidTurn = new SimPID(pEncTurn, iEncTurn, dEncTurn, epsEncTurn);
 	}
 
 	public void shiftUp() {
@@ -336,6 +343,23 @@ public class DriveTrain {
 		
 		SmartDashboard.putBoolean("Turn isDone", pidTurn.isDone());
 		return pidTurn.isDone();
+	}
+	
+	public boolean pidEncTurn(int encDiff){
+		setState(DriveTrain.states.AUTO);
+		encPidTurn.setDesiredValue(encDiff);
+		
+		double xVal = encPidTurn.calcPID(leftEncoder.get()-rightEncoder.get());
+		SmartDashboard.putNumber("X Val", xVal);
+		double leftDrive = SimLib.calcLeftTankDrive(xVal, 0.0);
+		double rightDrive = SimLib.calcRightTankDrive(xVal, 0.0);
+		
+			leftMotor.set(leftDrive);
+			rightMotor.set(-rightDrive);
+
+		
+		SmartDashboard.putBoolean("Turn isDone", encPidTurn.isDone());
+		return encPidTurn.isDone();
 	}
 	
 	public boolean pidDrive(int position){
