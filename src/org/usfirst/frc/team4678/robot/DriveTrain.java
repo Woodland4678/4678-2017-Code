@@ -35,10 +35,10 @@ public class DriveTrain {
 	public static final double iDrive = 0.0075;
 	public static final double dDrive = 0.02;
 	public static final double epsDrive = 50;
-	public static final double pTurn = 0.05;
+	public static final double pTurn = 0.035;
 	public static final double iTurn = 0;
-	public static final double dTurn = 0.02;
-	public static final double epsTurn = 2;
+	public static final double dTurn = 0.018;
+	public static final double epsTurn = 3;
 	
 	
 	AHRS ahrs;

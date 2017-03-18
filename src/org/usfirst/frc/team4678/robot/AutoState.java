@@ -27,6 +27,7 @@ public class AutoState {
 	public void runState(){
 		if(iterations == 0){
 			resetSensors();
+			System.out.println("Sensors Reset");
 			robot.driveTrain.leftMotor.set(0);
 			robot.driveTrain.rightMotor.set(0);
 		}
@@ -78,6 +79,7 @@ public class AutoState {
 	}
 	
 	public void resetSensors(){
+		
 		robot.driveTrain.leftEncoder.reset();
 		robot.driveTrain.rightEncoder.reset();
 		robot.driveTrain.ahrs.reset();
