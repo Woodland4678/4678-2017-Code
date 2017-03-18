@@ -28,14 +28,12 @@ public class AutoState {
 		if(iterations == 0){
 			resetSensors();
 			System.out.println("Sensors Reset");
-			robot.driveTrain.leftMotor.set(0);
-			robot.driveTrain.rightMotor.set(0);
 		}
 		iterations++;
 		if(desiredDriveEncoderVal == 0 && desiredAngle != 0){
-			robot.driveTrain.pidTurn(desiredAngle);
+			robot.driveTrain.pidTurn(desiredAngle, 1);
 		}else if(desiredAngle == 0 && desiredDriveEncoderVal != 0){
-			robot.driveTrain.pidDrive(desiredDriveEncoderVal);
+			robot.driveTrain.pidDrive(desiredDriveEncoderVal, 0.5);
 		}else if(desiredDriveEncoderVal == 0 && desiredAngle == 0){
 			robot.driveTrain.leftMotor.set(0);
 			robot.driveTrain.rightMotor.set(0);
@@ -80,9 +78,7 @@ public class AutoState {
 	
 	public void resetSensors(){
 		
-		robot.driveTrain.leftEncoder.reset();
-		robot.driveTrain.rightEncoder.reset();
-		robot.driveTrain.ahrs.reset();
+		robot.resetSensors();
 	}
 	
 }

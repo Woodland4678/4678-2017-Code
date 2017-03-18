@@ -1,9 +1,11 @@
 package org.usfirst.frc.team4678.robot;
 
-import com.kauailabs.navx.frc.AHRS;
 
+
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
@@ -20,7 +22,7 @@ public class DriveTrain {
 								// is back)
 	public Encoder rightEncoder; // counts down when robot reverses (ball pickup
 									// is back)
-	
+	public static Gyro gyro;
 	public static SimPID pidTurn;
 	public static SimPID pidDrive;
 	public static SimPID encPidTurn;
@@ -47,7 +49,7 @@ public class DriveTrain {
 	public static final double epsEncTurn = 100;
 	
 	
-	AHRS ahrs;
+	
 	// public static final int AXIS = 0; //0 for Left Joystick on Controller, 2
 	// for Right
 	int goToDistanceState = 0;
@@ -81,7 +83,7 @@ public class DriveTrain {
 			int leftEncChannelB) {
 		leftMotor = new VictorSP(leftPWM);
 		rightMotor = new VictorSP(rightPWM);
-		ahrs = new AHRS(SPI.Port.kMXP);
+		
 		
 		rightEncoder = new Encoder(rightEncChannelA, rightEncChannelB, false, EncodingType.k4X);
 		rightEncoder.setDistancePerPulse(1.0);
@@ -100,6 +102,7 @@ public class DriveTrain {
 		pidTurn = new SimPID(pTurn, iTurn, iTurn, epsTurn);
 		pidDrive = new SimPID(pDrive, iDrive, dDrive, epsDrive);
 		encPidTurn = new SimPID(pEncTurn, iEncTurn, dEncTurn, epsEncTurn);
+		gyro = new ADXRS450_Gyro();
 	}
 
 	public void shiftUp() {
@@ -328,17 +331,17 @@ public class DriveTrain {
 		goToDistanceState = 0;
 	}
 
-	public boolean pidTurn(int angle){
+	public boolean pidTurn(int angle, double multiplier){
 		setState(DriveTrain.states.AUTO);
 		pidTurn.setDesiredValue(angle);
 		
-		double xVal = pidTurn.calcPID(ahrs.getAngle());
+		double xVal = pidTurn.calcPID(gyro.getAngle());
 		SmartDashboard.putNumber("X Val", xVal);
 		double leftDrive = SimLib.calcLeftTankDrive(xVal, 0.0);
 		double rightDrive = SimLib.calcRightTankDrive(xVal, 0.0);
 		
-			leftMotor.set(-leftDrive);
-			rightMotor.set(rightDrive);
+			leftMotor.set(-leftDrive*multiplier);
+			rightMotor.set(rightDrive*multiplier);
 
 		
 		SmartDashboard.putBoolean("Turn isDone", pidTurn.isDone());
@@ -362,20 +365,15 @@ public class DriveTrain {
 		return encPidTurn.isDone();
 	}
 	
-	public boolean pidDrive(int position){
+	public boolean pidDrive(int position, double multiplier){
 		setState(DriveTrain.states.AUTO);
 		pidDrive.setDesiredValue(position);
 		double yVal = pidDrive.calcPID((leftEncoder.get()+rightEncoder.get())/2);
 		double leftDrive = SimLib.calcLeftTankDrive(0, yVal);
 		double rightDrive = SimLib.calcRightTankDrive(0,  yVal);
-		
-		if(pidDrive.isDone()){
-			leftMotor.set(0);
-			rightMotor.set(0);
-		}else{
-			leftMotor.set(leftDrive);
-			rightMotor.set(-rightDrive);
-		}
+			leftMotor.set(leftDrive*multiplier);
+			rightMotor.set(-rightDrive*multiplier);
+
 		
 		SmartDashboard.putBoolean("Drive isDone", pidTurn.isDone());
 		return pidDrive.isDone();

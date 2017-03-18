@@ -16,14 +16,12 @@ public class AutoMode {
 		
 		if(autoStates.get(currentState).isStateDone()){
 			if(currentState < ((autoStates.size()) -1)){
-				autoStates.get(currentState).robot.driveTrain.leftMotor.set(0);
-				autoStates.get(currentState).robot.driveTrain.rightMotor.set(0);
 				currentState++;
 				
 			}else{
+
 				autoStates.get(currentState).robot.driveTrain.leftMotor.set(0);
 				autoStates.get(currentState).robot.driveTrain.rightMotor.set(0);
-				
 			}
 			
 		}else{

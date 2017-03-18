@@ -1,7 +1,7 @@
 package org.usfirst.frc.team4678.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
@@ -112,7 +112,7 @@ public class Robot extends IterativeRobot {
 	// Camera
 	public static UsbCamera camera;
 	public static PowerDistributionPanel pdp;
-
+	
 	public static boolean oscillate = false;
 	// State Machine Enums
 	// DriveStateMachine
@@ -128,6 +128,7 @@ public class Robot extends IterativeRobot {
 	public static AutoState middleGearAutoState1;
 	public static AutoState middleGearAutoState2;
 	public static AutoState middleGearAutoState3;
+	public static AutoState middleGearAutoState4;
 	public static ArrayList<AutoState> middleGearAutoArrayList;
 	public static AutoMode middleGearAuto;
 	public static AutoState rightGearAutoState1;
@@ -148,19 +149,32 @@ public class Robot extends IterativeRobot {
 	public static ArrayList<AutoState> leftGearAutoArrayList;
 	public static AutoMode leftGearAuto;
 	
+	
+	public static AutoState leftToMiddleAutoState1;
+	public static AutoState leftToMiddleAutoState2;
+	public static ArrayList<AutoState> leftGearToMiddleAutoArrayList;
+	public static AutoMode leftGearToMiddleAuto;
+	
+	public static AutoState rightToMiddleAutoState1;
+	public static AutoState rightToMiddleAutoState2;
+	public static ArrayList<AutoState> rightGearToMiddleAutoArrayList;
+	public static AutoMode rightGearToMiddleAuto;
+	
 	public void autoModeAssemble(){
 		middleGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
-		middleGearAutoState2 = new AutoState(6000,0,GearClaw.states.READYTOSCORE,0, this);
+		middleGearAutoState2 = new AutoState(6700,0,GearClaw.states.READYTOSCORE,0, this);
 		middleGearAutoState3 = new AutoState(0,0,GearClaw.states.SCORE,0, this);
+		middleGearAutoState4 = new AutoState(-1500, 0,GearClaw.states.SCORE,0, this);
 		middleGearAutoArrayList = new ArrayList<AutoState>();
 		middleGearAutoArrayList.add(middleGearAutoState1);
 		middleGearAutoArrayList.add(middleGearAutoState2);
 		middleGearAutoArrayList.add(middleGearAutoState3);
+		middleGearAutoArrayList.add(middleGearAutoState4);
 		middleGearAuto = new AutoMode(middleGearAutoArrayList);
 		
 		rightGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
-		rightGearAutoState2 = new AutoState(7500,0,GearClaw.states.LIFT, 0, this);
-		rightGearAutoState3 = new AutoState(0,-72, GearClaw.states.READYTOSCORE, 0 ,this);
+		rightGearAutoState2 = new AutoState(8200,0,GearClaw.states.LIFT, 0, this);
+		rightGearAutoState3 = new AutoState(0,-45, GearClaw.states.READYTOSCORE, 0 ,this);
 		rightGearAutoState4 = new AutoState(1800,0,GearClaw.states.READYTOSCORE, 0, this);
 		rightGearAutoState5 = new AutoState(0,0,GearClaw.states.SCORE, 0, this);
 		rightGearAutoState6 = new AutoState(-1800,0,GearClaw.states.SCORE, 0, this);
@@ -173,12 +187,26 @@ public class Robot extends IterativeRobot {
 		rightGearAutoArrayList.add(rightGearAutoState6);
 		rightGearAuto = new AutoMode(rightGearAutoArrayList);
 		
+		rightToMiddleAutoState1 = new AutoState(0,45, GearClaw.states.LIFT, 0, this);
+		rightToMiddleAutoState2 = new AutoState(10000, 0, GearClaw.states.CLAMP, 0, this);
+		rightGearToMiddleAutoArrayList.add(rightGearAutoState1);
+		rightGearToMiddleAutoArrayList.add(rightGearAutoState2);
+		rightGearToMiddleAutoArrayList.add(rightGearAutoState3);
+		rightGearToMiddleAutoArrayList.add(rightGearAutoState4);
+		rightGearToMiddleAutoArrayList.add(rightGearAutoState5);
+		rightGearToMiddleAutoArrayList.add(rightGearAutoState6);
+		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState1);
+		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState2);
+		rightGearToMiddleAuto = new AutoMode(rightGearToMiddleAutoArrayList);
+		
+		
+		
 		leftGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
-		leftGearAutoState2 = new AutoState(8331,0,GearClaw.states.LIFT, 0, this);
-		leftGearAutoState3 = new AutoState(0,47, GearClaw.states.READYTOSCORE, 0 ,this);
-		leftGearAutoState4 = new AutoState(1000,0,GearClaw.states.READYTOSCORE, 0, this);
+		leftGearAutoState2 = new AutoState(8000,0,GearClaw.states.LIFT, 0, this);
+		leftGearAutoState3 = new AutoState(0,50, GearClaw.states.READYTOSCORE, 0 ,this);
+		leftGearAutoState4 = new AutoState(2400,0,GearClaw.states.READYTOSCORE, 0, this);
 		leftGearAutoState5 = new AutoState(0,0,GearClaw.states.SCORE, 15, this);
-		leftGearAutoState6 = new AutoState(-1000,0,GearClaw.states.SCORE, 0, this);
+		leftGearAutoState6 = new AutoState(-2400,0,GearClaw.states.SCORE, 0, this);
 		leftGearAutoArrayList = new ArrayList<AutoState>();
 		leftGearAutoArrayList.add(leftGearAutoState1);
 		leftGearAutoArrayList.add(leftGearAutoState2);
@@ -188,8 +216,9 @@ public class Robot extends IterativeRobot {
 		leftGearAutoArrayList.add(leftGearAutoState6);
 		leftGearAuto = new AutoMode(leftGearAutoArrayList);
 		
+		
 	}
-	
+	s
 	@Override
 	public void robotInit() {
 		controllerInit();
@@ -223,47 +252,13 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		smartDashboard();
-		System.out.println(driveTrain.ahrs.getAngle());
-		if (operatorGamePad.getRawButton(0)) {
-			autoMode = 0;
-		}
-		if (operatorGamePad.getRawButton(1)) {
-			autoMode = 1;
-		}
-		if (operatorGamePad.getRawButton(2)) {
-			autoMode = 2;
-		}
-		if (operatorGamePad.getRawButton(3)) {
-			autoMode = 3;
-		}
-		if (operatorGamePad.getRawButton(4)) {
-			autoMode = 4;
-		}
-		if (operatorGamePad.getRawButton(5)) {
-			autoMode = 5;
-		}
-		if (operatorGamePad.getRawButton(6)) {
-			autoMode = 6;
-		}
-		if (operatorGamePad.getRawButton(7)) {
-			autoMode = 7;
-		}
-		if (operatorGamePad.getRawButton(8)) {
-			autoMode = 8;
-		}
-		if (operatorGamePad.getRawButton(9)) {
-			autoMode = 9;
-		}
-		if (operatorGamePad.getRawButton(10)) {
-			autoMode = 10;
-		}
 		
 		autoIterations++;
 		SmartDashboard.putNumber("Right Encoder", driveTrain.rightEncoder.get());
 		//SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
 		SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
 		SmartDashboard.putNumber("Auto State", rightGearAuto.currentState);
-		middleGearAuto.runMode();
+		rightGearAuto.runMode();
 		//driveTrain.pidTurn(90);
 		//driveTrain.pidEncTurn(500);
 	}
@@ -279,7 +274,6 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		System.out.println(driveTrain.ahrs.getAngle());
 		SmartDashboard.putNumber("Tele Iterations", teleIterations);
 		SmartDashboard.putNumber("Auto Iterations", autoIterations);
 		teleIterations++;
@@ -480,9 +474,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		if(operatorGamePad.getRawButton(12)){
-			driveTrain.ahrs.reset();
-			driveTrain.leftEncoder.reset();
-			driveTrain.rightEncoder.reset();
+			resetSensors();
 		}
 		if(operatorGamePad.getRawButton(11)){
 			claw.setState(GearClaw.states.LIFT);
@@ -497,8 +489,7 @@ public class Robot extends IterativeRobot {
 			SmartDashboard.putNumber("Right Encoder", driveTrain.rightEncoder.get());
 			//SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
 			SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
-			SmartDashboard.putNumber("gyro", driveTrain.ahrs.getAngle());
-			
+			SmartDashboard.putNumber("gyro adr", driveTrain.gyro.getAngle());
 			SmartDashboard.putNumber("Claw Encoder", claw.pivotMotor.getPulseWidthPosition());
 			SmartDashboard.putNumber("Ball Pivot Encoder", baller.pivotMotor.getPulseWidthPosition());
 			// SmartDashboard.putNumber("Ball Roller Encoder",
@@ -515,7 +506,7 @@ public class Robot extends IterativeRobot {
 	public void resetSensors(){
 		driveTrain.leftEncoder.reset();
 		driveTrain.rightEncoder.reset();
-		driveTrain.ahrs.reset();
+		driveTrain.gyro.reset();
 	}
 
 }
