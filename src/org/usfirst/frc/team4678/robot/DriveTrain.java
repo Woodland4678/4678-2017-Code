@@ -36,11 +36,11 @@ public class DriveTrain {
 	//PID CONSTANTS
 	public static final double pDrive = 0.03;
 	public static final double iDrive = 0.0075;
-	public static final double dDrive = 0.02;
+	public static final double dDrive = 0.06;
 	public static final double epsDrive = 50;
 	public static final double pTurn = 0.035;
 	public static final double iTurn = 0;
-	public static final double dTurn = 0.018;
+	public static final double dTurn = 0.07;
 	public static final double epsTurn = 3;
 	
 	public static final double pEncTurn = 0.05;
@@ -66,8 +66,8 @@ public class DriveTrain {
 	double rightPercentThere;
 	double leftMotorMultiplier;
 	double rightMotorMultiplier;
-	double encoderClicksPerCentimeter = 7.2;
-	double GO_TO_DISTANCE_CORRECTION_SPEED = 1.0;
+	double encoderClicksPerCentimeter = 30; // 7.2;
+	double GO_TO_DISTANCE_CORRECTION_SPEED = 5.0;
 	double powerOffset;
 	double leftPower = 0;
 	double rightPower = 0;
@@ -306,8 +306,8 @@ public class DriveTrain {
 		// Robot.encoderClicksPerCentimeter())));
 
 		System.out.println("Left Power = "+leftMotorMultiplier * power * rampDownPercentage+" Right Power = "+rightMotorMultiplier * power * rampDownPercentage);
-		leftMotor.set(leftMotorMultiplier * power * rampDownPercentage);
-		rightMotor.set(rightMotorMultiplier * power * rampDownPercentage);
+		leftMotor.set(-rightMotorMultiplier * power * rampDownPercentage);
+		rightMotor.set(leftMotorMultiplier * power * rampDownPercentage);
 
 		// If the left and the right both have gone far enough stop the motors,
 		// and reset the goToDistanceState so that the next time
