@@ -73,7 +73,7 @@ public class DriveTrain {
 	double rightPower = 0;
 
 	public static enum states {
-		JOYSTICKDRIVE, AUTO, DISABLED
+		JOYSTICKDRIVE, AUTO, PIVOTLEFTBALLFORWARD, PIVOTRIGHTBALLFORWARD, PIVOTLEFTGEARFORWARD, PIVOTRIGHTGEARFORWARD, DISABLED
 	}
 
 	public static states currentState = states.AUTO;
@@ -125,6 +125,18 @@ public class DriveTrain {
 			break;
 		case AUTO:
 
+			break;
+		case PIVOTLEFTBALLFORWARD:
+			pivotLeftBallForward();
+			break;
+		case PIVOTRIGHTBALLFORWARD:
+			pivotRightBallForward();
+			break;
+		case PIVOTLEFTGEARFORWARD:
+			pivotLeftGearForward();
+			break;
+		case PIVOTRIGHTGEARFORWARD:
+			pivotRightGearForward();
 			break;
 		case DISABLED:
 
@@ -377,5 +389,22 @@ public class DriveTrain {
 		
 		SmartDashboard.putBoolean("Drive isDone", pidTurn.isDone());
 		return pidDrive.isDone();
+	}
+	
+	public void pivotLeftGearForward(){
+		leftMotor.set(-1);
+		rightMotor.set(0.1);
+	}
+	public void pivotRightGearForward(){
+		leftMotor.set(-0.1);
+		rightMotor.set(1);
+	}
+	public void pivotRightBallForward(){
+		leftMotor.set(1);
+		rightMotor.set(-0.1);
+	}
+	public void pivotLeftBallForward(){
+		leftMotor.set(0.1);
+		rightMotor.set(-1);
 	}
 }

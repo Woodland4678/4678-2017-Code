@@ -5,26 +5,35 @@ import edu.wpi.first.wpilibj.*;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.*;
 
+
 public class GearClaw {
 	public static CANTalon pivotMotor;
 	public static DoubleSolenoid clamp;
 	public static AnalogInput gearLeft;
 	public static AnalogInput gearRight;
-	// Practice bot positions
-	public static final int CLAW_PICKUP_POS = 3780;
-	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
-	public static final int CLAW_UP_POS = 2850;
-	public static final int CLAW_SCORE_POS = 3150;
-	public static final int CLAW_HOLD_POS = 2950;
-	public static int lastGearLeftVal = 0;
-	public static int lastGearRightVal = 0;
-	public static int iterator = 0;
-
+	public static Boolean toGoUp = false;
 	// Competition bot positions
 	// public static final int CLAW_PICKUP_POS = 2741;
-	// public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
-	// public static final int CLAW_UP_POS = 1740;
-	// public static final int CLAW_SCORE_POS = 2114;
+	
+	// Practice bot positions
+	public static final int CLAW_PICKUP_POS = 250; // 3780 practice
+	public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS - 150;
+	public static final int CLAW_UP_POS = CLAW_PICKUP_POS + 930*3; // 2850 
+	public static final int CLAW_SCORE_POS = CLAW_PICKUP_POS + 585*3; // 3150
+	public static final int CLAW_HOLD_POS = CLAW_PICKUP_POS + 980*3; // 2950 
+
+	// Before new gear system added.
+	//public static final int CLAW_PICKUP_POS = 2712; // 3780 practice
+	//public static final int CLAW_DOWN_POS = CLAW_PICKUP_POS + 70;
+	//public static final int CLAW_UP_POS = CLAW_PICKUP_POS - 930; // 2850 
+	//public static final int CLAW_SCORE_POS = CLAW_PICKUP_POS - 585; // 3150
+	//public static final int CLAW_HOLD_POS = CLAW_PICKUP_POS - 830; // 2950 
+	
+	public static int[] leftGearValues = {0,0,0,0,0};
+	public static int[] rightGearValues = {0,0,0,0,0};
+	//public static int lastGearRightVal = 0;
+	public static int iterator = 1000;
+
 	public static enum states {
 		PICKUP, CLAMP, LIFT, READYTOSCORE, SCORE, HOLD, MANUAL
 	}
@@ -32,13 +41,13 @@ public class GearClaw {
 	public static states currentState = states.MANUAL;
 	public boolean canOpenPanel = true; // used to determine if we can legally
 										// open the pickup panel
-
+	public static Robot robot;
 	public GearClaw(int PCMCanID, int PCMForwardChannel, int PCMReverseChannel, int CANTalonID, double TalonP,
-			double TalonI, double TalonD, int gearSensor1, int gearSensor2) {
+			double TalonI, double TalonD, int gearSensor1, int gearSensor2, Robot robot) {
 		clamp = new DoubleSolenoid(PCMCanID, PCMForwardChannel, PCMReverseChannel);
 		pivotMotor = new CANTalon(CANTalonID);
 		pivotMotor.setPID(TalonP, TalonI, TalonD);
-		pivotMotor.configMaxOutputVoltage(8);
+		pivotMotor.configMaxOutputVoltage(12); // Was 8
 		pivotMotor.setAllowableClosedLoopErr(5);
 		// clawPivot.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
 		pivotMotor.setEncPosition(pivotMotor.getPulseWidthPosition());
@@ -46,6 +55,8 @@ public class GearClaw {
 		
 		gearLeft = new AnalogInput(gearSensor1);
 		gearRight = new AnalogInput(gearSensor2);
+		
+		this.robot = robot;
 	}
 
 	public void extend() {
@@ -85,10 +96,19 @@ public class GearClaw {
 		pivotMotor.set(CLAW_HOLD_POS);
 
 	}
+	
+	public boolean clawIsInsideBumper() { // return true if claw is inside the bumper
+		// testing shows that this takes place when claw position is lower than 3036 
+		// which is CLAW_PICKUP_POS - 744
+		if (pivotMotor.getPulseWidthPosition() < CLAW_PICKUP_POS - 744)
+			return true;
+		else
+			return false;
+	}
 
 	public void stateMachine() { // called by Robot.java at 50Hz
 		
-		
+		this.getGearValues();
 		switch (currentState) {
 		case PICKUP:
 			canOpenPanel = false; // if we are in pickup mode we cannot deploy
@@ -99,13 +119,19 @@ public class GearClaw {
 			break;
 		case CLAMP:
 			canOpenPanel = false; // if we are in clamp mode we cannot deploy
-			waitThenClamp();						// the pickup panel
+	waitThenClamp();	
+			
+			if(!robot.driverGamePad.getRawButton(robot.PICKUP_BTN) && toGoUp){
+				this.setState(GearClaw.states.LIFT);
+			}
+			// the pickup panel
 			down();
 			retract();
 			break;
 		case LIFT:
 			up();
 			retract();
+			toGoUp = false;
 			canOpenPanel = true; // if we are in lift mode the panel will be
 									// able to deploy legally
 			break;
@@ -131,24 +157,41 @@ public class GearClaw {
 
 	}
 	public void autoGearClamp(){
-		if(lastGearLeftVal > 1100 && gearLeft.getValue() < 800 ){
+		
+
+		
+		if(leftGearValues[0] > 1400 && leftGearValues[4]< 500 ){
 			this.setState(GearClaw.states.CLAMP);
 			
 			iterator = 0;
 			//this.setState(GearClaw.states.LIFT);
 		}
 		
-		if(lastGearRightVal > 1100 && gearRight.getValue() <800){
+		
+		if(rightGearValues[0] > 1200 && rightGearValues[4] <600){
 	this.setState(GearClaw.states.CLAMP);
 			
 			iterator = 0;
 		}
 		
-		lastGearLeftVal = gearLeft.getValue();
-		lastGearRightVal = gearRight.getValue();
 	}
+	
+	public void getGearValues(){
+		leftGearValues[0] = leftGearValues[1];
+		leftGearValues[1] = leftGearValues[2];
+		leftGearValues[2] = leftGearValues[3];
+		leftGearValues[3] = leftGearValues[4];
+		leftGearValues[4] = gearLeft.getValue();
+		
+		rightGearValues[0] = rightGearValues[1];
+		rightGearValues[1] = rightGearValues[2];
+		rightGearValues[2] = rightGearValues[3];
+		rightGearValues[3] = rightGearValues[4];
+		rightGearValues[4] = gearRight.getValue();
+	}
+	
 	public void setState(states newState) {
-		currentState = newState;
+		currentState = newState;  
 	}
 
 	public boolean getOpenPanelStatus() {
@@ -156,10 +199,20 @@ public class GearClaw {
 	}
 	
 	public void waitThenClamp(){
+		
 		iterator++;
 		if(iterator == 13){
-			this.setState(GearClaw.states.LIFT);
+			toGoUp = true;
 			iterator = 1000;
+		}
+	}
+	
+	
+	public boolean clawContained(){
+		if(currentState == states.LIFT){
+			return true;
+		}else{
+			return false;
 		}
 	}
 

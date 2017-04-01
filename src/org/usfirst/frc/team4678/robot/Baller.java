@@ -27,15 +27,16 @@ public class Baller {
 	//public static final double shooterF = 0;//0.0;
 
 	// Pivot Motor Constants
-	public static final int INTAKE_PICKUP_HEIGHT = 3300;
-	public static final int INTAKE_RELEASE_HEIGHT = 2100;
-	public static final int INTAKE_ENCLOSED_HEIGHT = 1700;
-	public static final int INTAKE_LOWGOALREADY_HEIGHT = 1600;
+	//public static final int INTAKE_PICKUP_HEIGHT = 3300;
+	//public static final int INTAKE_RELEASE_HEIGHT = 2100;
+	//public static final int INTAKE_ENCLOSED_HEIGHT = 1700;
+	//public static final int INTAKE_LOWGOALREADY_HEIGHT = 1600;
 
 	// Competition bot positions
-	// public static final int INTAKE_PICKUP_HEIGHT = 3600;
-	// public static final int INTAKE_RELEASE_HEIGHT = 2314;
-	// public static final int INTAKE_ENCLOSED_HEIGHT = 1988;
+	 public static final int INTAKE_PICKUP_HEIGHT = 3550;
+	 public static final int INTAKE_RELEASE_HEIGHT = 2314;
+	 public static final int INTAKE_ENCLOSED_HEIGHT = 1988;
+	 public static final int INTAKE_LOWGOALREADY_HEIGHT = 1888;
 	
 	// Windmill Motor Constants
 	public static final double WINDMILLSPINSPEED = 0.9f;
@@ -67,7 +68,7 @@ public class Baller {
 	public static VictorSP agitator;
 	
 	public static enum IntakeStates {
-		ENCLOSED, PICKUP, RELEASE
+		ENCLOSED, PICKUP, RELEASE, LOWGOAL
 	}
 	
 	public static enum PanelStates {
@@ -77,6 +78,12 @@ public class Baller {
 	public static enum WindmillStates {
 		RETRACTED, DEPLOYED
 	}
+	
+	public static enum autoStates{
+		DEPLOY, SHOOT, RETRACT, END1, END2
+	}
+	
+	public static autoStates currentAutoState = autoStates.RETRACT;
 
 	public static boolean canLowerClaw = true; // used to determine if the claw
 												// can lower and we stay within
@@ -127,16 +134,20 @@ public class Baller {
 	}
 
 	public void pickup() {
+		//System.out.println("Pickup");
 		intakeState = IntakeStates.PICKUP;
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_PICKUP_HEIGHT);
 		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		//intakeMotor.set(PICKUPSPEED);
-		intakeMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		intakeMotor.set(0.3);
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(PICKUPSPEED);
+		//intakeMotor.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		//intakeMotor.set(0.3);
 	}
 
 	public void release() {
+		//System.out.println("Release");
 		intakeState = IntakeStates.RELEASE;
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_RELEASE_HEIGHT);
@@ -145,39 +156,68 @@ public class Baller {
 	}
 
 	public void enclose() {
+		//System.out.println("Enclose");
+		intakeState = IntakeStates.RELEASE;
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
-
 		pivotMotor.set(INTAKE_ENCLOSED_HEIGHT);
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		intakeMotor.set(0);
 	}
 	public void lowGoalReady(){
+		//System.out.println("lowGoalReady");
 		//System.out.println("fish");
+		intakeState = IntakeStates.LOWGOAL;
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
-		pivotMotor.set(INTAKE_LOWGOALREADY_HEIGHT);
+		pivotMotor.set(INTAKE_RELEASE_HEIGHT);
 	}
+	
+	public boolean lowGoalIsReady() {
+		if (Math.abs(pivotMotor.get() - INTAKE_RELEASE_HEIGHT) < 100) {
+			return true;
+		}
+		else {
+			System.out.println("lowGoalIsReady = false, position difference = " + Math.abs(pivotMotor.get() - INTAKE_RELEASE_HEIGHT));
+		}
+		return false;
+	}
+
 	public void lowGoalHopper(){
 		hopperExtend();
 	}
 	public void lowGoalShoot(){
+		intakeState = IntakeStates.LOWGOAL;
+		//System.out.println("lowGoalShoot");
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		intakeMotor.set(LOWGOALSPEED);
 		pivotMotor.configMaxOutputVoltage(7);
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_RELEASE_HEIGHT);
-		agitate(1);
+		//agitate(1);
+	}
+	public void lowGoalVarShoot(double speed){ // speed should be -10000 to -35000
+		intakeState = IntakeStates.LOWGOAL;
+		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
+		intakeMotor.set(speed);
+		//pivotMotor.configMaxOutputVoltage(7);
+		//pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
+		//pivotMotor.set(INTAKE_RELEASE_HEIGHT);
+		//agitate(1);
 	}
 	public void lowGoalStop(){
+		intakeState = IntakeStates.RELEASE;
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		intakeMotor.set(0);
-		agitate(0);
+		//agitate(0);
 	}
 	public void lowGoalReverse(){
+		intakeState = IntakeStates.LOWGOAL;
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
 		intakeMotor.set(LOWGOALREVERSE);
 	}
 	
 	public void stopDown(){
+		//System.out.println("stopDown");
+		intakeState = IntakeStates.RELEASE;
 		pivotMotor.changeControlMode(CANTalon.TalonControlMode.Position);
 		pivotMotor.set(INTAKE_PICKUP_HEIGHT);
 		intakeMotor.changeControlMode(CANTalon.TalonControlMode.Speed);
@@ -219,10 +259,19 @@ public class Baller {
 	
 //	public void elevatorSpeed(double spd) {
 	//	elevatorMotor.set(spd); // Set the elevator motor speed
-	//}
-
-
+//	//}
+//
+	public static String hopperPrint=null;
+	public void hopperDashboardPrint(){	
+		if (panelState ==PanelStates.RETRACTED){
+			hopperPrint=("Closed");
+		}
+		if (panelState ==PanelStates.DEPLOYED){
+			hopperPrint=("Open");
+		}
+	}
 	public void hopperRetract() {
+		//System.out.println("Hopper Retract");
 		panelState = PanelStates.RETRACTED;
 		if (millState == WindmillStates.RETRACTED)
 			canLowerClaw = true;
@@ -231,13 +280,14 @@ public class Baller {
 	}
 
 	public void hopperExtend() {
+		////System.out.println("Hopper Extend");
 		panelState = PanelStates.DEPLOYED;
 		canLowerClaw = false;
 		hopperPneumatic.set(DoubleSolenoid.Value.kForward);
 	}
 
 	public void lowerMills() {
-		System.out.println("now in the lowermills function");
+		//System.out.println("now in the lowermills function");
 		millState = WindmillStates.DEPLOYED;
 		canLowerClaw = false;
 		windMillLift.set(WINDMILL_LOWERED);
@@ -317,5 +367,36 @@ public class Baller {
 //	public double getShooterSpeed() {
 //		return shooterMotor.getSpeed();
 //	}
+	
+	public void autoStateMachine(){
+		if(currentAutoState == autoStates.DEPLOY){
+			hopperExtend();
+		}
+		
+		if(currentAutoState == autoStates.RETRACT){
+			hopperRetract();
+		}
+		if(currentAutoState == autoStates.SHOOT){
+			lowGoalShoot();
+		}
+		if(currentAutoState == autoStates.END1){
+					enclose();
+				}
+		if(currentAutoState == autoStates.END2){
+			hopperRetract();
+		}
+	}
+	
+	public void setAutoState(autoStates desiredState){
+		currentAutoState = desiredState;
+	}
+	
+	public boolean ballerContained(){
+		if(hopperPneumatic.get() == DoubleSolenoid.Value.kReverse){
+			return true;
+		}else{
+			return false;
+		}
+	}
 
 }

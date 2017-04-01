@@ -7,6 +7,9 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import com.ctre.CANTalon;
 import java.util.*;
+
+import org.usfirst.frc.team4678.robot.Baller.PanelStates;
+
 import edu.wpi.first.wpilibj.CameraServer;
 
 /**
@@ -45,11 +48,11 @@ public class Robot extends IterativeRobot {
 	public static final int PICKUP_PANEL_SERVO_RIGHT_ID = 6; // pwm 6
 	//public static final int SHOOTER_MOTOR = 3;
 	//public static final int ELEVATOR_MOTOR = 7; //pwm 7
-	
+	public static int drivingDirection = 0;
 	
 	public static final int gearSensor1 = 2;
 	public static final int gearSensor2 = 3;
-	
+	public static boolean GOSCORE = false;
 	
 	// Pneumatics
 	public static final int PCM = 0;
@@ -64,11 +67,11 @@ public class Robot extends IterativeRobot {
 	// Controllers
 	public static final int DRIVERGAMEPAD = 0;
 	public static final int OPERATORGAMEPAD = 1;
-	public static final int OPERATOR16BUTTON = 2;
+	public static final int SELECTORSWITCHES = 2;
 
 	// PIDConstants
 	// Claw
-	public static final double clawPIDP = 3;
+	public static final double clawPIDP = 4;
 	public static final double clawPIDI = 0;
 	public static final double clawPIDD = 0;
 
@@ -97,7 +100,7 @@ public class Robot extends IterativeRobot {
 	// Controllers
 	public static Joystick driverGamePad;
 	public static Joystick operatorGamePad;
-	public static Joystick operator16;
+	public static Joystick selectorswitches;
 
 	// Claw
 	public static DoubleSolenoid clawGrabber;
@@ -126,13 +129,18 @@ public class Robot extends IterativeRobot {
 	public static int autoMode = 0;
 	public static int teleIterations = 0;
 	public static int autoIterations = 0;
-
+	//public static String hopperState = (baller.)
+	public static AutoState nothing;
+	public static ArrayList<AutoState> nothingList;
+	public static AutoMode nothingAuto;
+	
 	public static AutoState middleGearAutoState1;
 	public static AutoState middleGearAutoState2;
 	public static AutoState middleGearAutoState3;
 	public static AutoState middleGearAutoState4;
 	public static ArrayList<AutoState> middleGearAutoArrayList;
 	public static AutoMode middleGearAuto;
+	
 	public static AutoState rightGearAutoState1;
 	public static AutoState rightGearAutoState2;
 	public static AutoState rightGearAutoState3;
@@ -163,6 +171,17 @@ public class Robot extends IterativeRobot {
 	public static ArrayList<AutoState> leftGearToMiddleAutoArrayList;
 	public static AutoMode leftGearToMiddleAuto;
 	
+	public static AutoState leftToBoilerAutoState1;
+	public static AutoState leftToBoilerAutoState2;
+	public static AutoState leftToBoilerAutoState3;
+	public static AutoState leftToBoilerAutoState4;
+	public static AutoState leftToBoilerAutoState5;
+	public static AutoState leftToBoilerAutoState6;
+	public static AutoState leftToBoilerAutoState7;
+	public static AutoState leftToBoilerAutoState8;
+	public static ArrayList<AutoState> leftGearToBoilerAutoArrayList;
+	public static AutoMode leftGearToBoilerAuto;
+	
 	public static AutoState rightToMiddleAutoState1;
 	public static AutoState rightToMiddleAutoState2;
 	public static AutoState rightToMiddleAutoState3;
@@ -171,14 +190,27 @@ public class Robot extends IterativeRobot {
 	public static AutoState rightToMiddleAutoState6;
 	public static AutoState rightToMiddleAutoState7;
 	public static AutoState rightToMiddleAutoState8;
-
 	public static ArrayList<AutoState> rightGearToMiddleAutoArrayList;
 	public static AutoMode rightGearToMiddleAuto;
 	
+	public static AutoState rightToBoilerAutoState1;
+	public static AutoState rightToBoilerAutoState2;
+	public static AutoState rightToBoilerAutoState3;
+	public static AutoState rightToBoilerAutoState4;
+	public static AutoState rightToBoilerAutoState5;
+	public static AutoState rightToBoilerAutoState6;
+	public static AutoState rightToBoilerAutoState7;
+	public static AutoState rightToBoilerAutoState8;
+	public static ArrayList<AutoState> rightGearToBoilerAutoArrayList;
+	public static AutoMode rightGearToBoilerAuto;
+	
+	public static AutoMode selectedAutoMode;
+	public static String autoName = "Nothing"; 
+	
 	public void autoModeAssemble(){
 		middleGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
-		middleGearAutoState2 = new AutoState(-220,-220,GearClaw.states.READYTOSCORE, this);
-		middleGearAutoState3 = new AutoState(0,0,GearClaw.states.SCORE,0, this);
+		middleGearAutoState2 = new AutoState(-230,-230, 0.75, 15,25,0.5,0.4, GearClaw.states.READYTOSCORE, this);
+		middleGearAutoState3 = new AutoState(0,0,GearClaw.states.SCORE,15, this);
 		middleGearAutoState4 = new AutoState(-1500, 0,GearClaw.states.SCORE,0, this);
 		middleGearAutoArrayList = new ArrayList<AutoState>();
 		middleGearAutoArrayList.add(middleGearAutoState1);
@@ -187,12 +219,17 @@ public class Robot extends IterativeRobot {
 		middleGearAutoArrayList.add(middleGearAutoState4);
 		middleGearAuto = new AutoMode(middleGearAutoArrayList);
 		
+		nothing = new AutoState(0,0, this);
+		nothingList = new ArrayList<AutoState>();
+		nothingList.add(nothing);
+		nothingAuto = new AutoMode(nothingList);
+		selectedAutoMode = nothingAuto;
 		rightGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
 		//rightGearAutoState2 = new AutoState(8200,0,GearClaw.states.LIFT, 0, this);
-		rightGearAutoState2 = new AutoState(-340,-250, GearClaw.states.READYTOSCORE,  this);
+		rightGearAutoState2 = new AutoState(-340,-270, GearClaw.states.READYTOSCORE,  this);
 		//rightGearAutoState3 = new AutoState(0,-45, GearClaw.states.READYTOSCORE, 0 ,this);
-		rightGearAutoState3 = new AutoState(1500,0,GearClaw.states.READYTOSCORE, 0, this);
-		rightGearAutoState4 = new AutoState(0,0,GearClaw.states.SCORE, 0, this);
+		rightGearAutoState3 = new AutoState(1000,0,GearClaw.states.READYTOSCORE, 0, this);
+		rightGearAutoState4 = new AutoState(0,0,GearClaw.states.SCORE, 15, this);
 		rightGearAutoState5 = new AutoState(-2400,0,GearClaw.states.SCORE, 0, this);
 		rightGearAutoArrayList = new ArrayList<AutoState>();
 		rightGearAutoArrayList.add(rightGearAutoState1);
@@ -225,9 +262,29 @@ public class Robot extends IterativeRobot {
 		rightGearToMiddleAuto = new AutoMode(rightGearToMiddleAutoArrayList);
 		
 		
+		rightToBoilerAutoState1 = rightGearAutoState1;
+		rightToBoilerAutoState2 = rightGearAutoState2;
+		rightToBoilerAutoState3 = rightGearAutoState3;
+		rightToBoilerAutoState4 = rightGearAutoState4;
+		rightToBoilerAutoState5 = rightGearAutoState5;
+		//rightToMiddleAutoState6 = rightGearAutoState6;
+		rightToBoilerAutoState6 = new AutoState(GearClaw.states.LIFT, this);
+		rightToBoilerAutoState7 = new AutoState(268,276,Baller.autoStates.DEPLOY,this);
+		rightToBoilerAutoState8 = new AutoState(Baller.autoStates.SHOOT, this);
+		rightGearToBoilerAutoArrayList = new ArrayList<AutoState>();
+		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState1);
+		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState2);
+		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState3);
+		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState4);
+		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState5);
+		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState6);
+		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState7);
+		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState8);
+		rightGearToBoilerAuto = new AutoMode(rightGearToMiddleAutoArrayList);
+		
 		
 		leftGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
-		leftGearAutoState2 = new AutoState(-260,-340, GearClaw.states.READYTOSCORE,  this);
+		leftGearAutoState2 = new AutoState(-270,-340, GearClaw.states.READYTOSCORE,  this);
 		//leftGearAutoState3 = new AutoState(0,50, GearClaw.states.READYTOSCORE, 0 ,this);
 		leftGearAutoState3 = new AutoState(1000,0,GearClaw.states.READYTOSCORE, 0, this);
 		leftGearAutoState4 = new AutoState(0,0,GearClaw.states.SCORE, 15, this);
@@ -258,7 +315,28 @@ public class Robot extends IterativeRobot {
 		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState6);
 		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState7);
 		//leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState8);
-		leftGearToMiddleAuto = new AutoMode(leftGearToMiddleAutoArrayList); 
+		leftGearToMiddleAuto = new AutoMode(leftGearToMiddleAutoArrayList);
+		
+		leftToBoilerAutoState1 = leftGearAutoState1;
+		leftToBoilerAutoState2 = leftGearAutoState2;
+		leftToBoilerAutoState3 = leftGearAutoState3;
+		leftToBoilerAutoState4 = leftGearAutoState4;
+		leftToBoilerAutoState5 = leftGearAutoState5;
+		//rightToMiddleAutoState6 = rightGearAutoState6;
+		leftToBoilerAutoState6 = new AutoState(GearClaw.states.LIFT, this);
+		leftToBoilerAutoState7 = new AutoState(276,268,Baller.autoStates.DEPLOY,this);
+		
+		leftToBoilerAutoState8 = new AutoState(Baller.autoStates.SHOOT, this);
+		leftGearToBoilerAutoArrayList = new ArrayList<AutoState>();
+		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState1);
+		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState2);
+		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState3);
+		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState4);
+		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState5);
+		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState6);
+		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState7);
+		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState8);
+		leftGearToBoilerAuto = new AutoMode(leftGearToMiddleAutoArrayList);
 		
 	}
 	@Override
@@ -267,7 +345,7 @@ public class Robot extends IterativeRobot {
 		driveTrain = new DriveTrain(LEFT_DRIVE_MOTOR, RIGHT_DRIVE_MOTOR, COMPRESSOR, PCM, HIGH_GEAR, LOW_GEAR,
 				driverGamePad, RIGHT_ENC_CHANNEL_A, RIGHT_ENC_CHANNEL_B, LEFT_ENC_CHANNEL_A, LEFT_ENC_CHANNEL_B);
 		climber = new Climber(CLIMBER_MOTOR);
-		claw = new GearClaw(PCM, CLAW_EXTEND, CLAW_RETRACT, CLAW_PIVOT_MOTOR, clawPIDP, clawPIDI, clawPIDD, gearSensor1, gearSensor2);
+		claw = new GearClaw(PCM, CLAW_EXTEND, CLAW_RETRACT, CLAW_PIVOT_MOTOR, clawPIDP, clawPIDI, clawPIDD, gearSensor1, gearSensor2, this);
 		baller = new Baller(BALL_PIVOT_MOTOR, BALL_ROLLER_MOTOR, WIND_MILL_SPIN_MOTOR, WIND_MILL_LIFT_MOTOR,
 				PCM, HOPPER_OPEN,HOPPER_CLOSE );// SHOOTER_MOTOR, ELEVATOR_MOTOR);
 		camera = CameraServer.getInstance().startAutomaticCapture(0);
@@ -285,7 +363,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousInit() {
-	
+		selectedAutoMode.currentState = 0;
+		driveTrain.shiftDown();
 	}
 
 	/**
@@ -300,7 +379,11 @@ public class Robot extends IterativeRobot {
 		//SmartDashboard.putNumber("Shooter Speed", baller.getShooterSpeed());
 		SmartDashboard.putNumber("Left Encoder", driveTrain.leftEncoder.get());
 		SmartDashboard.putNumber("Auto State", rightGearAuto.currentState);
-		leftGearAuto.runMode();
+		if(autoName == "Nothing"){
+			
+		}else{
+			selectedAutoMode.runMode();
+		}
 		//driveTrain.pidTurn(90);
 		//driveTrain.pidEncTurn(500);
 	}
@@ -316,13 +399,15 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopPeriodic() {
+		baller.hopperDashboardPrint();
 		SmartDashboard.putNumber("Tele Iterations", teleIterations);
 		SmartDashboard.putNumber("Auto Iterations", autoIterations);
+		SmartDashboard.putString("Hopper: ", Baller.hopperPrint);
 		teleIterations++;
 		driverControls();
 		//baller.printShooterSpeed();
 		operatorControls();
-		operatorBTNpadControls();
+		//operatorBTNpadControls();
 		driveTrain.stateMachine();
 		claw.stateMachine();
 		smartDashboard();
@@ -333,17 +418,63 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void disabledPeriodic() {
-		SmartDashboard.putNumber("Tele Iterations", teleIterations);
-		SmartDashboard.putNumber("Auto Iterations", autoIterations);
-		smartDashboard();
-		SmartDashboard.putNumber("Gear Left", claw.gearLeft.getValue());
-		SmartDashboard.putNumber("Gear Right", claw.gearRight.getValue());
-		SmartDashboard.putNumber("Right Gear Auto Auto State", rightGearAuto.currentState);
-		SmartDashboard.putNumber("Gear Voltage", claw.gearLeft.getAverageVoltage());
+		if(readSelector1() == 0){
+			if(readSelector2() == 0){
+				selectedAutoMode = leftGearAuto; 
+				autoName = "leftGearAuto";
+			}else if(readSelector2() == 1){
+				selectedAutoMode = middleGearAuto;
+				autoName = "middleGearAuto";
+			}else if(readSelector2() == 2){
+				selectedAutoMode = rightGearAuto;
+				autoName = "rightGearAuto";
+			}else if(readSelector2() == 3){
+				selectedAutoMode = leftGearToMiddleAuto;
+				autoName = "leftGearToMiddleAuto";
+			}else if(readSelector2() == 4){
+				selectedAutoMode = rightGearToMiddleAuto;
+				autoName = "rightGearToMiddleAuto";
+			}else if(readSelector2() == 5){
+				selectedAutoMode = rightGearToBoilerAuto;
+				autoName = "rightGearToBoilerAuto";
+			}else if(readSelector2() == 6){
+				
+			}else if(readSelector2() == 7){
+				
+			}
+		}else if(readSelector1() == 1){
+			if(readSelector2() == 0){
+				selectedAutoMode = leftGearAuto; 
+				autoName = "leftGearAuto";
+			}else if(readSelector2() == 1){
+				selectedAutoMode = middleGearAuto;
+				autoName = "middleGearAuto";
+			}else if(readSelector2() == 2){
+				selectedAutoMode = rightGearAuto;
+				autoName = "rightGearAuto";
+			}else if(readSelector2() == 3){
+				selectedAutoMode = leftGearToMiddleAuto;
+				autoName = "leftGearToMiddleAuto";
+			}else if(readSelector2() == 4){
+				selectedAutoMode = rightGearToMiddleAuto;
+				autoName = "rightGearToMiddleAuto";
+			}else if(readSelector2() == 5){
+				selectedAutoMode = leftGearToBoilerAuto;
+				autoName = "leftGearToBoilerAuto";
+			}else if(readSelector2() == 6){
+				
+			}else if(readSelector2() == 7){
+				
+			}
+		}else{
+				autoName = "Nothing";
+		}
+		
 		if(driverGamePad.getRawButton(1)){
 			resetSensors();
-			rightGearAuto.currentState = 0;
 		}
+		
+		smartDashboard();
 	}
 
 	/**
@@ -358,18 +489,24 @@ public class Robot extends IterativeRobot {
 
 		driverGamePad = new Joystick(DRIVERGAMEPAD);
 		operatorGamePad = new Joystick(OPERATORGAMEPAD);
-		operator16 = new Joystick(OPERATOR16BUTTON);
+		selectorswitches = new Joystick(SELECTORSWITCHES);
 	}
 
 	public void driverControls() {
 		//System.out.println("Fish");
+		
+		if(claw.currentState != GearClaw.states.PICKUP){
+			GOSCORE = true;
+		}else{
+			GOSCORE = false;
+		}
 		if (driverGamePad.getRawButton(SHIFT_DOWN_BTN)) {
 			driveTrain.shiftDown();
 		}
 		if (driverGamePad.getRawButton(SHIFT_UP_BTN)) {
 			driveTrain.shiftUp();
 		}
-		if (driverGamePad.getRawButton(PICKUP_BTN) && baller.getCanLowerClawStatus() == true) {
+		if (driverGamePad.getRawButton(PICKUP_BTN) && baller.getCanLowerClawStatus() == true && claw.currentState != GearClaw.states.CLAMP && claw.currentState != GearClaw.states.PICKUP) {
 			claw.setState(GearClaw.states.PICKUP);
 		}
 		if (driverGamePad.getRawButton(CLAMP_BTN) && baller.getCanLowerClawStatus() == true) {
@@ -383,6 +520,29 @@ public class Robot extends IterativeRobot {
 			claw.setState(GearClaw.states.SCORE);
 			;
 		}
+		
+		
+		if(driverGamePad.getRawAxis(DriveTrain.AXIS +1) < -0.3){
+			drivingDirection = 1;
+		}else if(driverGamePad.getRawAxis(DriveTrain.AXIS +1) > 0.3){
+			drivingDirection = -1;
+		}
+		if(driverGamePad.getRawButton(7) && drivingDirection == 1){
+			driveTrain.shiftUp();
+			driveTrain.setState(DriveTrain.states.PIVOTLEFTGEARFORWARD);
+		}else if(driverGamePad.getRawButton(8) && drivingDirection == 1){
+			driveTrain.shiftUp();
+			driveTrain.setState(DriveTrain.states.PIVOTRIGHTGEARFORWARD);
+		}else if(driverGamePad.getRawButton(7) && drivingDirection == -1){
+			driveTrain.shiftUp();
+			driveTrain.setState(DriveTrain.states.PIVOTLEFTBALLFORWARD);
+		}else if(driverGamePad.getRawButton(8) && drivingDirection == -1){
+			driveTrain.shiftUp();
+			driveTrain.setState(DriveTrain.states.PIVOTRIGHTBALLFORWARD);
+		}else
+		{
+			driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE);
+		}
 //		if (driverGamePad.getPOV() == 180) {
 //			baller.pickup();
 //		}
@@ -395,68 +555,68 @@ public class Robot extends IterativeRobot {
 //		if (driverGamePad.getPOV() == 270) {
 //			baller.release();
 //		}
-		if(driverGamePad.getRawButton(8)){
+		/*if(driverGamePad.getRawButton(8)){
 			claw.setState(GearClaw.states.READYTOSCORE);
-		}
+		}*/
 		
 		
 		
 	}
-	public void operatorBTNpadControls(){
-		if(operator16.getRawButton(1)) { // reset GotoDistance code
-			driveTrain.resetGoToDistanceState();
-			gdist = 0; // allow gotodistance to run
-			driveTrain.leftEncoder.reset();
-			driveTrain.rightEncoder.reset();
-  		}
-		if(operator16.getRawButton(2)) { // Test goto distance code
-			driveTrain.setState(DriveTrain.states.AUTO); // Disable the joystick drive control
-			if (gdist == 0) {
-				if(driveTrain.goToDistance(-260, -330, 1, 15, 25, 0.50, 0.50)) { // rightCentimeters, leftCentimeters, power, rampUpDistance,
-					gdist = 1; // end go to Distance when we get true
-					}	// rampDownDistance, startingPower, endingPower
-			}
- 		}
-		else if (DriveTrain.currentState == DriveTrain.states.AUTO)
-		{
-			driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE); // back to JOYSTICK when we let go of the button
-		}
-		if (operator16.getRawButton(3)) {
-			//baller.hopperExtend();
-			//oscillate = true;
-		}
-		if (operator16.getRawButton(4)) {
-			//oscillate = false;
-		}
-		if (operator16.getRawButton(1)) {
-			claw.setState(GearClaw.states.HOLD);
-			;
-		}
-		if (operator16.getRawButton(16)){
-			baller.lowGoalReady();
-		}
-		if (operator16.getRawButton(14)){
-			baller.lowGoalHopper();
-		}
-		if (operator16.getRawButton(15)){
-			baller.lowGoalShoot();
-		}
-		if (operator16.getRawButton(10)){
-			baller.lowGoalReverse();
-		}
-		if (operator16.getRawButton(13)){
-			baller.lowGoalStop();
-		}
-		if (operator16.getRawButton(12)){
-			baller.pickup();
-		}
-		if (operator16.getRawButton(9)){
-			baller.enclose();
-		}
-		if (operator16.getRawButton(8)){
-			baller.stopDown();
-		}
-	}
+//	public void operatorBTNpadControls(){
+//		if(operator16.getRawButton(1)) { // reset GotoDistance code
+//			driveTrain.resetGoToDistanceState();
+//			gdist = 0; // allow gotodistance to run
+//			driveTrain.leftEncoder.reset();
+//			driveTrain.rightEncoder.reset();
+//  		}
+//		if(operator16.getRawButton(2)) { // Test goto distance code
+//			driveTrain.setState(DriveTrain.states.AUTO); // Disable the joystick drive control
+//			if (gdist == 0) {
+//				if(driveTrain.goToDistance(-260, -330, 1, 15, 25, 0.50, 0.50)) { // rightCentimeters, leftCentimeters, power, rampUpDistance,
+//					gdist = 1; // end go to Distance when we get true
+//					}	// rampDownDistance, startingPower, endingPower
+//			}
+// 		}
+//		else if (DriveTrain.currentState == DriveTrain.states.AUTO)
+//		{
+//			driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE); // back to JOYSTICK when we let go of the button
+//		}
+//		if (operator16.getRawButton(3)) {
+//			//baller.hopperExtend();
+//			//oscillate = true;
+//		}
+//		if (operator16.getRawButton(4)) {
+//			//oscillate = false;
+//		}
+//		if (operator16.getRawButton(1)) {
+//			claw.setState(GearClaw.states.HOLD);
+//			;
+//		}
+//		if (operator16.getRawButton(16)){
+//			baller.lowGoalReady();
+//		}
+//		if (operator16.getRawButton(14)){
+//			baller.lowGoalHopper();
+//		}
+//		if (operator16.getRawButton(15)){
+//			baller.lowGoalShoot();
+//		}
+//		if (operator16.getRawButton(10)){
+//			baller.lowGoalReverse();
+//		}
+//		if (operator16.getRawButton(13)){
+//			baller.lowGoalStop();
+//		}
+//		if (operator16.getRawButton(12)){
+//			baller.pickup();
+//		}
+//		if (operator16.getRawButton(9)){
+//			baller.enclose();
+//		}
+//		if (operator16.getRawButton(8)){
+//			baller.stopDown();
+//		}
+//	}
 	public void operatorControls() {
 		// System.out.println("HELLO");
 		// if(operatorGamePad.getRawButton(1) && claw.canOpenPanel == true) {
@@ -465,7 +625,7 @@ public class Robot extends IterativeRobot {
 		// baller.lowerMills();
 		// }
 
-		if (operatorGamePad.getRawButton(1)) { // can only lower mills if the
+		if ((operatorGamePad.getRawButton(1))&&(claw.clawIsInsideBumper())) { // can only lower mills if the
 												// claw is in an upper position
 												// (same situation as the pickup
 												// panel)
@@ -482,37 +642,19 @@ public class Robot extends IterativeRobot {
 		if (operatorGamePad.getRawButton(2)) {
 			baller.spinMillIn(); // spins wind mills towards the intake
 		}
-		if (operatorGamePad.getRawButton(5) && claw.getOpenPanelStatus() == true) { // to
-																					// open
-																					// panel
-																					// we
-																					// need
-																					// to
-																					// make
-																					// sure
-																					// the
-																					// claw
-																					// is
-																					// in
-																					// an
-																					// upper
-																					// position
-																					// to
-																					// stay
-																					// within
-																					// legal
-																					// volume
-			// baller.deployPickUpPanel(); //opens up pickup panel
-			baller.hopperRetract();
-			System.out.println("deploy is allowed, opening pickup panel!");
+		if ((operatorGamePad.getRawButton(5))&&(claw.clawIsInsideBumper())) { 
+			//System.out.println("hopperExtend");
+			baller.hopperExtend();
+			//System.out.println("deploy is allowed, opening pickup panel!");
 		}
 		//System.out.println("Cat");
 		
 		if (operatorGamePad.getRawButton(6)) { // always allowed to do this so
 												// no need for extra conditions
+			//System.out.println("hopperRetract");
 			//System.out.println("Dog");
-			baller.hopperExtend();
-			SmartDashboard.putNumber("Operator Controls WOrking", 13);
+			baller.hopperRetract();
+			//SmartDashboard.putNumber("Operator Controls WOrking", 13);
 			
 			
 			// baller.retractPickUpPanel(); //closes pickup panel
@@ -527,10 +669,9 @@ public class Robot extends IterativeRobot {
 		if(operatorGamePad.getRawButton(12)){
 			resetSensors();
 		}
-		if(operatorGamePad.getRawButton(11)){
-			claw.setState(GearClaw.states.LIFT);
-
-		}
+		//if(operatorGamePad.getRawButton(11)){
+		//	claw.setState(GearClaw.states.LIFT);
+		//}
 		if (operatorGamePad.getRawButton(8)) {
 			climber.climbFast();
 		}
@@ -541,8 +682,95 @@ public class Robot extends IterativeRobot {
 		else {
 		climber.climbStop();
 		}
-
-
+		// Use joystick to operate the low goal shooting instead of 16 button pad
+		// Left and Right to activate the agitator (right = fwd, left = rvs)
+		// Up to run the roller in full speed feed into low goal
+		// Down to run the roller in low speed, increasing speed the further the joystick
+		// is moved in the downward direction
+		// pressing the joystick down (button 11) to reverse the rollers, agitators to
+		// run in the away from roller direction (reverse).
+		// The agitators can be activate this way at any time.  Other functions may
+		// require some pre-requisite conditions
+		// If door is closed, only the agitators will work.  Otherwise, low goal
+		// functions will be activated, provide the pivot is in the scoring position
+		// If it's not, the up joystick function will send it to scoring position and 
+		// then allow low goal roller operation.
+		// Testing shows we shouldn't do much of anything for joystick axis values
+		// below 0.25. Fully diagonal positions do not return 1 for both axis,
+		// more like 0.75 so anything over 0.5 should be good for full on.
+		// Released position does not always provide a 0.0 return value but it will certainly
+		// be less than 0.25
+		double ogpxaxis = operatorGamePad.getRawAxis(LEFT_AXISX);
+		double ogpyaxis = operatorGamePad.getRawAxis(LEFT_AXISY);
+		//System.out.println("ogpxaxis = "+ogpxaxis+" ogpyaxis = "+ogpyaxis);
+		if (ogpxaxis > 0.25) { // activate agitator based on x axis
+			baller.agitate(1.0);
+		}
+		else if (ogpxaxis < -0.25) {
+			baller.agitate(-1.0);
+		}
+		else {
+			baller.agitate(0.0); // turn it off if joystick is in middle.
+		}
+		if ((Baller.panelState == PanelStates.DEPLOYED)&&(Baller.intakeState != Baller.IntakeStates.PICKUP)) { // Only when deployed
+			// and not in PICKUP mode ...
+			if (operatorGamePad.getRawButton(11)) { // If joystick pressed, this is reverse
+				baller.lowGoalReverse();
+				baller.agitate(-1.0);
+			}
+			else { // other low goal stuff can happen as long as we're not pressing the joystick
+				if (ogpyaxis < -0.5) { // When pressing up ...
+						if (!baller.lowGoalIsReady()) {
+							baller.lowGoalReady();
+						}
+						else {
+							baller.lowGoalShoot(); // shoot when ready.
+						}
+					}
+				else if (ogpyaxis > 0.25) { // when joystick is moved down, vary speed of shooter from slow to fast. 
+					baller.lowGoalVarShoot(ogpyaxis * -35000); // will be from about 9000 to 35000
+					}
+				else
+					baller.lowGoalStop(); // stop rollers if joystick is put in center.
+			}
+		}
+		if (Baller.panelState == PanelStates.DEPLOYED){
+			if (operatorGamePad.getPOV() == 90) {
+				baller.pickup();
+			}
+			if (operatorGamePad.getPOV() == 180) {
+				baller.enclose();
+			}
+			if (operatorGamePad.getPOV() == 270) {
+				baller.stopDown();
+			}
+		}
+	}
+	
+	public int readSelector1() { // Read the left selector switch for auto configuration
+		int rval;
+		
+		rval = 0;
+		if (selectorswitches.getRawButton(14))
+			rval += 1;
+		if (selectorswitches.getRawButton(15))
+			rval += 2;
+		if (selectorswitches.getRawButton(16))
+			rval += 4;
+		return(rval);
+	}
+	
+	public int readSelector2() { // Read the right selector switch for auto configuration
+		int rval;
+		
+		rval = 0;
+		if (selectorswitches.getRawButton(13))
+			rval += 1;
+		if (selectorswitches.getRawButton(12))
+			rval += 2;
+		if (selectorswitches.getRawButton(11))
+			rval += 4;
+		return(rval);
 	}
 
 	public void smartDashboard() {
@@ -554,11 +782,19 @@ public class Robot extends IterativeRobot {
 			SmartDashboard.putNumber("gyro adr", driveTrain.gyro.getAngle());
 			SmartDashboard.putNumber("Claw Encoder", claw.pivotMotor.getPulseWidthPosition());
 			SmartDashboard.putNumber("Ball Pivot Encoder", baller.pivotMotor.getPulseWidthPosition());
+			SmartDashboard.putNumber("First climber motor", pdp.getCurrent(12));
+			SmartDashboard.putNumber("Second Climber motor", pdp.getCurrent(2));
 			// SmartDashboard.putNumber("Ball Roller Encoder",
 			// baller.intakeMotor.getPulseWidthPosition());
 			// SmartDashboard.putNumber("Claw Encoder 2",
 			// clawPivot.getEncPosition());
-	
+			SmartDashboard.putString("Auto Mode", autoName);
+		//	SmartDashboard.putNumber("Auto Mode", readSelector1());
+			
+			SmartDashboard.putNumber("AutoState" , selectedAutoMode.currentState);
+			SmartDashboard.putNumber("gear Right", claw.gearRight.getValue());
+			SmartDashboard.putNumber("gear Left", claw.gearLeft.getValue());
+			SmartDashboard.putBoolean("GoScore", GOSCORE);
 
 		} else {
 
