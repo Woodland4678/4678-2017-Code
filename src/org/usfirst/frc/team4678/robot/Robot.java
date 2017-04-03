@@ -160,16 +160,27 @@ public class Robot extends IterativeRobot {
 	public static AutoMode leftGearAuto;
 	
 	
-	public static AutoState leftToMiddleAutoState1;
-	public static AutoState leftToMiddleAutoState2;
-	public static AutoState leftToMiddleAutoState3;
-	public static AutoState leftToMiddleAutoState4;
-	public static AutoState leftToMiddleAutoState5;
-	public static AutoState leftToMiddleAutoState6;
-	public static AutoState leftToMiddleAutoState7;
-	public static AutoState leftToMiddleAutoState8;
-	public static ArrayList<AutoState> leftGearToMiddleAutoArrayList;
-	public static AutoMode leftGearToMiddleAuto;
+	public static AutoState leftToMiddleStraightAutoState1;
+	public static AutoState leftToMiddleStraightAutoState2;
+	public static AutoState leftToMiddleStraightAutoState3;
+	public static AutoState leftToMiddleStraightAutoState4;
+	public static AutoState leftToMiddleStraightAutoState5;
+	public static AutoState leftToMiddleStraightAutoState6;
+	public static AutoState leftToMiddleStraightAutoState7;
+	public static AutoState leftToMiddleStraightAutoState8;
+	public static ArrayList<AutoState> leftGearToMiddleStraightAutoArrayList;
+	public static AutoMode leftGearToMiddleStraightAuto;
+	
+	public static AutoState leftToMiddleCrossAutoState1;
+	public static AutoState leftToMiddleCrossAutoState2;
+	public static AutoState leftToMiddleCrossAutoState3;
+	public static AutoState leftToMiddleCrossAutoState4;
+	public static AutoState leftToMiddleCrossAutoState5;
+	public static AutoState leftToMiddleCrossAutoState6;
+	public static AutoState leftToMiddleCrossAutoState7;
+	public static AutoState leftToMiddleCrossAutoState8;
+	public static ArrayList<AutoState> leftGearToMiddleCrossAutoArrayList;
+	public static AutoMode leftGearToMiddleCrossAuto;
 	
 	public static AutoState leftToBoilerAutoState1;
 	public static AutoState leftToBoilerAutoState2;
@@ -182,16 +193,27 @@ public class Robot extends IterativeRobot {
 	public static ArrayList<AutoState> leftGearToBoilerAutoArrayList;
 	public static AutoMode leftGearToBoilerAuto;
 	
-	public static AutoState rightToMiddleAutoState1;
-	public static AutoState rightToMiddleAutoState2;
-	public static AutoState rightToMiddleAutoState3;
-	public static AutoState rightToMiddleAutoState4;
-	public static AutoState rightToMiddleAutoState5;
-	public static AutoState rightToMiddleAutoState6;
-	public static AutoState rightToMiddleAutoState7;
-	public static AutoState rightToMiddleAutoState8;
-	public static ArrayList<AutoState> rightGearToMiddleAutoArrayList;
-	public static AutoMode rightGearToMiddleAuto;
+	public static AutoState rightToMiddleStraightAutoState1;
+	public static AutoState rightToMiddleStraightAutoState2;
+	public static AutoState rightToMiddleStraightAutoState3;
+	public static AutoState rightToMiddleStraightAutoState4;
+	public static AutoState rightToMiddleStraightAutoState5;
+	public static AutoState rightToMiddleStraightAutoState6;
+	public static AutoState rightToMiddleStraightAutoState7;
+	public static AutoState rightToMiddleStraightAutoState8;
+	public static ArrayList<AutoState> rightGearToMiddleStraightAutoArrayList;
+	public static AutoMode rightGearToMiddleStraightAuto;
+	
+	public static AutoState rightToMiddleCrossAutoState1;
+	public static AutoState rightToMiddleCrossAutoState2;
+	public static AutoState rightToMiddleCrossAutoState3;
+	public static AutoState rightToMiddleCrossAutoState4;
+	public static AutoState rightToMiddleCrossAutoState5;
+	public static AutoState rightToMiddleCrossAutoState6;
+	public static AutoState rightToMiddleCrossAutoState7;
+	public static AutoState rightToMiddleCrossAutoState8;
+	public static ArrayList<AutoState> rightGearToMiddleCrossAutoArrayList;
+	public static AutoMode rightGearToMiddleCrossAuto;
 	
 	public static AutoState rightToBoilerAutoState1;
 	public static AutoState rightToBoilerAutoState2;
@@ -242,50 +264,72 @@ public class Robot extends IterativeRobot {
 		
 		
 		
-		rightToMiddleAutoState1 = rightGearAutoState1;
-		rightToMiddleAutoState2 = rightGearAutoState2;
-		rightToMiddleAutoState3 = rightGearAutoState3;
-		rightToMiddleAutoState4 = rightGearAutoState4;
-		rightToMiddleAutoState5 = rightGearAutoState5;
+		rightToMiddleStraightAutoState1 = rightGearAutoState1;
+		rightToMiddleStraightAutoState2 = rightGearAutoState2;
+		rightToMiddleStraightAutoState3 = rightGearAutoState3;
+		rightToMiddleStraightAutoState4 = rightGearAutoState4;
+		rightToMiddleStraightAutoState5 = rightGearAutoState5;
 		//rightToMiddleAutoState6 = rightGearAutoState6;
-		rightToMiddleAutoState6 = new AutoState(0,45,GearClaw.states.LIFT, 0, this);
-		rightToMiddleAutoState7 = new AutoState(17000,0,GearClaw.states.LIFT, 0, this);
-		rightGearToMiddleAutoArrayList = new ArrayList<AutoState>();
-		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState1);
-		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState2);
-		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState3);
-		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState4);
-		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState5);
-		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState6);
-		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState7);
+		rightToMiddleStraightAutoState6 = new AutoState(0,53,GearClaw.states.LIFT, 0, this);
+		rightToMiddleStraightAutoState7 = new AutoState(-950,-900,this);
+		rightGearToMiddleStraightAutoArrayList = new ArrayList<AutoState>();
+		rightGearToMiddleStraightAutoArrayList.add(rightToMiddleStraightAutoState1);
+		rightGearToMiddleStraightAutoArrayList.add(rightToMiddleStraightAutoState2);
+		rightGearToMiddleStraightAutoArrayList.add(rightToMiddleStraightAutoState3);
+		rightGearToMiddleStraightAutoArrayList.add(rightToMiddleStraightAutoState4);
+		rightGearToMiddleStraightAutoArrayList.add(rightToMiddleStraightAutoState5);
+		rightGearToMiddleStraightAutoArrayList.add(rightToMiddleStraightAutoState6);
+		rightGearToMiddleStraightAutoArrayList.add(rightToMiddleStraightAutoState7);
 		//rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState8);
-		rightGearToMiddleAuto = new AutoMode(rightGearToMiddleAutoArrayList);
+		rightGearToMiddleStraightAuto = new AutoMode(rightGearToMiddleStraightAutoArrayList);
 		
+		
+		rightToMiddleCrossAutoState1 = rightGearAutoState1;
+		rightToMiddleCrossAutoState2 = rightGearAutoState2;
+		rightToMiddleCrossAutoState3 = rightGearAutoState3;
+		rightToMiddleCrossAutoState4 = rightGearAutoState4;
+		rightToMiddleCrossAutoState5 = rightGearAutoState5;
+		//rightToMiddleAutoState6 = rightGearAutoState6;
+		rightToMiddleCrossAutoState6 = new AutoState(0,42,GearClaw.states.LIFT, 0, this);
+		rightToMiddleCrossAutoState7 = new AutoState(-850,-700,this);
+		rightToMiddleCrossAutoState8 = new AutoState(-275,-350,this);
+		rightGearToMiddleCrossAutoArrayList = new ArrayList<AutoState>();
+		rightGearToMiddleCrossAutoArrayList.add(rightToMiddleCrossAutoState1);
+		rightGearToMiddleCrossAutoArrayList.add(rightToMiddleCrossAutoState2);
+		rightGearToMiddleCrossAutoArrayList.add(rightToMiddleCrossAutoState3);
+		rightGearToMiddleCrossAutoArrayList.add(rightToMiddleCrossAutoState4);
+		rightGearToMiddleCrossAutoArrayList.add(rightToMiddleCrossAutoState5);
+		rightGearToMiddleCrossAutoArrayList.add(rightToMiddleCrossAutoState6);
+		rightGearToMiddleCrossAutoArrayList.add(rightToMiddleCrossAutoState7);
+		rightGearToMiddleCrossAutoArrayList.add(rightToMiddleCrossAutoState8);
+		rightGearToMiddleCrossAuto = new AutoMode(rightGearToMiddleCrossAutoArrayList);
 		
 		rightToBoilerAutoState1 = rightGearAutoState1;
 		rightToBoilerAutoState2 = rightGearAutoState2;
 		rightToBoilerAutoState3 = rightGearAutoState3;
 		rightToBoilerAutoState4 = rightGearAutoState4;
-		rightToBoilerAutoState5 = rightGearAutoState5;
+		rightToBoilerAutoState5  = rightGearAutoState5;
+		rightToBoilerAutoState6 = new AutoState(255, 255, this);
 		//rightToMiddleAutoState6 = rightGearAutoState6;
-		rightToBoilerAutoState6 = new AutoState(GearClaw.states.LIFT, this);
-		rightToBoilerAutoState7 = new AutoState(268,276,Baller.autoStates.DEPLOY,this);
+		rightToBoilerAutoState7 = new AutoState(-0.25,0.25,5,this);
+		//rightToBoilerAutoState7 = new AutoState(185,215,Baller.autoStates.DEPLOY,this);
 		rightToBoilerAutoState8 = new AutoState(Baller.autoStates.SHOOT, this);
+
 		rightGearToBoilerAutoArrayList = new ArrayList<AutoState>();
-		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState1);
-		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState2);
-		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState3);
-		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState4);
-		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState5);
-		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState6);
-		rightGearToBoilerAutoArrayList.add(rightToMiddleAutoState7);
-		rightGearToMiddleAutoArrayList.add(rightToMiddleAutoState8);
-		rightGearToBoilerAuto = new AutoMode(rightGearToMiddleAutoArrayList);
+		rightGearToBoilerAutoArrayList.add(rightToBoilerAutoState1);
+		rightGearToBoilerAutoArrayList.add(rightToBoilerAutoState2);
+		rightGearToBoilerAutoArrayList.add(rightToBoilerAutoState3);
+		rightGearToBoilerAutoArrayList.add(rightToBoilerAutoState4);
+		rightGearToBoilerAutoArrayList.add(rightToBoilerAutoState5);
+		rightGearToBoilerAutoArrayList.add(rightToBoilerAutoState6);
+		rightGearToBoilerAutoArrayList.add(rightToBoilerAutoState7);
+		rightGearToBoilerAutoArrayList.add(rightToBoilerAutoState8);
+		rightGearToBoilerAuto = new AutoMode(rightGearToBoilerAutoArrayList);
 		
 		
 		leftGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
 		leftGearAutoState2 = new AutoState(-270,-340, GearClaw.states.READYTOSCORE,  this);
-		//leftGearAutoState3 = new AutoState(0,50, GearClaw.states.READYTOSCORE, 0 ,this);
+		//leftGearAutoState3 = new AutoState(0,5, GearClaw.states.READYTOSCORE, 0 ,this);
 		leftGearAutoState3 = new AutoState(1000,0,GearClaw.states.READYTOSCORE, 0, this);
 		leftGearAutoState4 = new AutoState(0,0,GearClaw.states.SCORE, 15, this);
 		leftGearAutoState5 = new AutoState(-2400,0,GearClaw.states.SCORE, 0, this);
@@ -298,45 +342,71 @@ public class Robot extends IterativeRobot {
 		//leftGearAutoArrayList.add(leftGearAutoState6);
 		leftGearAuto = new AutoMode(leftGearAutoArrayList);
 		
-		leftToMiddleAutoState1 = leftGearAutoState1;
-		leftToMiddleAutoState2 = leftGearAutoState2;
-		leftToMiddleAutoState3 = leftGearAutoState3;
-		leftToMiddleAutoState4 = leftGearAutoState4;
-		leftToMiddleAutoState5 = leftGearAutoState5;
+		leftToMiddleStraightAutoState1 = leftGearAutoState1;
+		leftToMiddleStraightAutoState2 = leftGearAutoState2;
+		leftToMiddleStraightAutoState3 = leftGearAutoState3;
+		leftToMiddleStraightAutoState4 = leftGearAutoState4;
+		leftToMiddleStraightAutoState5 = leftGearAutoState5;
 		//leftToMiddleAutoState6 = leftGearAutoState6;
-		leftToMiddleAutoState6 = new AutoState(0,-50,GearClaw.states.LIFT, 0, this);
-		leftToMiddleAutoState7 = new AutoState(17000,0,GearClaw.states.LIFT, 0, this);
-		leftGearToMiddleAutoArrayList = new ArrayList<AutoState>();
-		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState1);
-		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState2);
-		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState3);
-		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState4);
-		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState5);
-		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState6);
-		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState7);
+		leftToMiddleStraightAutoState6 = new AutoState(0,-53,GearClaw.states.LIFT, 0, this);
+		leftToMiddleStraightAutoState7 = new AutoState(-900,-950, this);
+		leftGearToMiddleStraightAutoArrayList = new ArrayList<AutoState>();
+		leftGearToMiddleStraightAutoArrayList.add(leftToMiddleStraightAutoState1);
+		leftGearToMiddleStraightAutoArrayList.add(leftToMiddleStraightAutoState2);
+		leftGearToMiddleStraightAutoArrayList.add(leftToMiddleStraightAutoState3);
+		leftGearToMiddleStraightAutoArrayList.add(leftToMiddleStraightAutoState4);
+		leftGearToMiddleStraightAutoArrayList.add(leftToMiddleStraightAutoState5);
+		leftGearToMiddleStraightAutoArrayList.add(leftToMiddleStraightAutoState6);
+		leftGearToMiddleStraightAutoArrayList.add(leftToMiddleStraightAutoState7);
 		//leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState8);
-		leftGearToMiddleAuto = new AutoMode(leftGearToMiddleAutoArrayList);
+		leftGearToMiddleStraightAuto = new AutoMode(leftGearToMiddleStraightAutoArrayList);
+		
+		leftToMiddleCrossAutoState1 = leftGearAutoState1;
+		leftToMiddleCrossAutoState2 = leftGearAutoState2;
+		leftToMiddleCrossAutoState3 = leftGearAutoState3;
+		leftToMiddleCrossAutoState4 = leftGearAutoState4;
+		leftToMiddleCrossAutoState5 = leftGearAutoState5;
+		//leftToMiddleAutoState6 = leftGearAutoState6;
+		leftToMiddleCrossAutoState6 = new AutoState(0,-42,GearClaw.states.LIFT, 0, this);
+		leftToMiddleCrossAutoState7 = new AutoState(-700,-850, this);
+		leftToMiddleCrossAutoState8 = new AutoState(-350, -275, this);
+		leftGearToMiddleCrossAutoArrayList = new ArrayList<AutoState>();
+		leftGearToMiddleCrossAutoArrayList.add(leftToMiddleCrossAutoState1);
+		leftGearToMiddleCrossAutoArrayList.add(leftToMiddleCrossAutoState2);
+		leftGearToMiddleCrossAutoArrayList.add(leftToMiddleCrossAutoState3);
+		leftGearToMiddleCrossAutoArrayList.add(leftToMiddleCrossAutoState4);
+		leftGearToMiddleCrossAutoArrayList.add(leftToMiddleCrossAutoState5);
+		leftGearToMiddleCrossAutoArrayList.add(leftToMiddleCrossAutoState6);
+		leftGearToMiddleCrossAutoArrayList.add(leftToMiddleCrossAutoState7);
+		leftGearToMiddleCrossAutoArrayList.add(leftToMiddleCrossAutoState8);
+		//leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState8);
+		leftGearToMiddleCrossAuto = new AutoMode(leftGearToMiddleCrossAutoArrayList);
+		
+		
+		
 		
 		leftToBoilerAutoState1 = leftGearAutoState1;
 		leftToBoilerAutoState2 = leftGearAutoState2;
 		leftToBoilerAutoState3 = leftGearAutoState3;
 		leftToBoilerAutoState4 = leftGearAutoState4;
 		leftToBoilerAutoState5 = leftGearAutoState5;
-		//rightToMiddleAutoState6 = rightGearAutoState6;
-		leftToBoilerAutoState6 = new AutoState(GearClaw.states.LIFT, this);
-		leftToBoilerAutoState7 = new AutoState(276,268,Baller.autoStates.DEPLOY,this);
+		leftToBoilerAutoState6 = new AutoState(255, 255, this);
+		//leftToBoilerAutoState6 = new AutoState(GearClaw.states.LIFT, this);
+		leftToBoilerAutoState7 =  new AutoState(-0.25,0.25,5,this);
 		
 		leftToBoilerAutoState8 = new AutoState(Baller.autoStates.SHOOT, this);
 		leftGearToBoilerAutoArrayList = new ArrayList<AutoState>();
-		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState1);
-		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState2);
-		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState3);
-		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState4);
-		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState5);
-		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState6);
-		leftGearToBoilerAutoArrayList.add(leftToMiddleAutoState7);
-		leftGearToMiddleAutoArrayList.add(leftToMiddleAutoState8);
-		leftGearToBoilerAuto = new AutoMode(leftGearToMiddleAutoArrayList);
+		leftGearToBoilerAutoArrayList.add(leftToBoilerAutoState1);
+		leftGearToBoilerAutoArrayList.add(leftToBoilerAutoState2);
+		leftGearToBoilerAutoArrayList.add(leftToBoilerAutoState3);
+		leftGearToBoilerAutoArrayList.add(leftToBoilerAutoState4);
+		leftGearToBoilerAutoArrayList.add(leftToBoilerAutoState5);
+		leftGearToBoilerAutoArrayList.add(leftToBoilerAutoState6);
+		leftGearToBoilerAutoArrayList.add(leftToBoilerAutoState7);
+		leftGearToBoilerAutoArrayList.add(leftToBoilerAutoState8);
+		leftGearToBoilerAuto = new AutoMode(leftGearToBoilerAutoArrayList);
+		
+
 		
 	}
 	@Override
@@ -365,6 +435,7 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		selectedAutoMode.currentState = 0;
 		driveTrain.shiftDown();
+		resetSensors();
 	}
 
 	/**
@@ -429,11 +500,11 @@ public class Robot extends IterativeRobot {
 				selectedAutoMode = rightGearAuto;
 				autoName = "rightGearAuto";
 			}else if(readSelector2() == 3){
-				selectedAutoMode = leftGearToMiddleAuto;
-				autoName = "leftGearToMiddleAuto";
+				selectedAutoMode = leftGearToMiddleStraightAuto;
+				autoName = "leftGearToMiddleStraightAuto";
 			}else if(readSelector2() == 4){
-				selectedAutoMode = rightGearToMiddleAuto;
-				autoName = "rightGearToMiddleAuto";
+				selectedAutoMode = rightGearToMiddleCrossAuto;
+				autoName = "rightGearToMiddleCrossAuto";
 			}else if(readSelector2() == 5){
 				selectedAutoMode = rightGearToBoilerAuto;
 				autoName = "rightGearToBoilerAuto";
@@ -453,11 +524,11 @@ public class Robot extends IterativeRobot {
 				selectedAutoMode = rightGearAuto;
 				autoName = "rightGearAuto";
 			}else if(readSelector2() == 3){
-				selectedAutoMode = leftGearToMiddleAuto;
-				autoName = "leftGearToMiddleAuto";
+				selectedAutoMode = leftGearToMiddleCrossAuto;
+				autoName = "leftGearToMiddleCrossAuto";
 			}else if(readSelector2() == 4){
-				selectedAutoMode = rightGearToMiddleAuto;
-				autoName = "rightGearToMiddleAuto";
+				selectedAutoMode = rightGearToMiddleStraightAuto;
+				autoName = "rightGearToMiddleStraightAuto";
 			}else if(readSelector2() == 5){
 				selectedAutoMode = leftGearToBoilerAuto;
 				autoName = "leftGearToBoilerAuto";
@@ -509,16 +580,17 @@ public class Robot extends IterativeRobot {
 		if (driverGamePad.getRawButton(PICKUP_BTN) && baller.getCanLowerClawStatus() == true && claw.currentState != GearClaw.states.CLAMP && claw.currentState != GearClaw.states.PICKUP) {
 			claw.setState(GearClaw.states.PICKUP);
 		}
-		if (driverGamePad.getRawButton(CLAMP_BTN) && baller.getCanLowerClawStatus() == true) {
-			claw.setState(GearClaw.states.CLAMP);
+		if (driverGamePad.getRawButton(3)) {
+			claw.setState(GearClaw.states.READYTOSCORE);
+			//driveTrain.pidDrive(5000, 1);
 		}
 		if (driverGamePad.getRawButton(READY_TO_SCORE_BTN)) {
-			claw.setState(GearClaw.states.HOLD);
-			;
-		}
-		if (driverGamePad.getRawButton(PLACE_BTN)) {
 			claw.setState(GearClaw.states.SCORE);
-			;
+			//driveTrain.pidTurn(90, 1);
+		}
+		if (driverGamePad.getRawButton(1)) {
+			claw.setState(GearClaw.states.CLAMP);
+			//resetSensors();
 		}
 		
 		
@@ -539,8 +611,9 @@ public class Robot extends IterativeRobot {
 		}else if(driverGamePad.getRawButton(8) && drivingDirection == -1){
 			driveTrain.shiftUp();
 			driveTrain.setState(DriveTrain.states.PIVOTRIGHTBALLFORWARD);
-		}else
-		{
+		}else if(driverGamePad.getRawButton(1) || driverGamePad.getRawButton(3) || driverGamePad.getRawButton(2)){
+			driveTrain.setState(DriveTrain.states.AUTO);
+		}else {
 			driveTrain.setState(DriveTrain.states.JOYSTICKDRIVE);
 		}
 //		if (driverGamePad.getPOV() == 180) {
@@ -795,6 +868,7 @@ public class Robot extends IterativeRobot {
 			SmartDashboard.putNumber("gear Right", claw.gearRight.getValue());
 			SmartDashboard.putNumber("gear Left", claw.gearLeft.getValue());
 			SmartDashboard.putBoolean("GoScore", GOSCORE);
+			SmartDashboard.putNumber("NavX", driveTrain.navX.getAngle());
 
 		} else {
 
@@ -805,6 +879,7 @@ public class Robot extends IterativeRobot {
 		driveTrain.leftEncoder.reset();
 		driveTrain.rightEncoder.reset();
 		driveTrain.gyro.reset();
+		driveTrain.navX.reset();
 	}
 
 }

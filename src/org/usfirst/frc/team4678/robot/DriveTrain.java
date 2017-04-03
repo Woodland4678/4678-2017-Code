@@ -2,6 +2,8 @@ package org.usfirst.frc.team4678.robot;
 
 
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -23,6 +25,7 @@ public class DriveTrain {
 	public Encoder rightEncoder; // counts down when robot reverses (ball pickup
 									// is back)
 	public static Gyro gyro;
+	public static AHRS navX;
 	public static SimPID pidTurn;
 	public static SimPID pidDrive;
 	public static SimPID encPidTurn;
@@ -30,8 +33,10 @@ public class DriveTrain {
 	public static DoubleSolenoid shifter;
 	public static Joystick driveGamePad;
 	public static final int AXIS = 0; // 0 for Left Joystick on Controller, 2
-										// for Right
+							
 	
+	// for Right
+		
 	
 	//PID CONSTANTS
 	public static final double pDrive = 0.03;
@@ -71,7 +76,10 @@ public class DriveTrain {
 	double powerOffset;
 	double leftPower = 0;
 	double rightPower = 0;
-
+	
+	
+	int pidLeftStart = 0;
+	int pidRightStart = 0;
 	public static enum states {
 		JOYSTICKDRIVE, AUTO, PIVOTLEFTBALLFORWARD, PIVOTRIGHTBALLFORWARD, PIVOTLEFTGEARFORWARD, PIVOTRIGHTGEARFORWARD, DISABLED
 	}
@@ -103,6 +111,7 @@ public class DriveTrain {
 		pidDrive = new SimPID(pDrive, iDrive, dDrive, epsDrive);
 		encPidTurn = new SimPID(pEncTurn, iEncTurn, dEncTurn, epsEncTurn);
 		gyro = new ADXRS450_Gyro();
+		navX = new AHRS(SPI.Port.kMXP);
 	}
 
 	public void shiftUp() {
@@ -205,8 +214,8 @@ public class DriveTrain {
 		targetRight = rightCentimeters * encoderClicksPerCentimeter; // used to
 																		// be
 																		// parameters
-		System.out.println(
-				"hi goToDistanceState=" + goToDistanceState + " " + startingLeftDistance + " " + startingRightDistance + " tleft="+targetLeft+" tright="+targetRight);
+		//System.out.println(
+			//	"hi goToDistanceState=" + goToDistanceState + " " + startingLeftDistance + " " + startingRightDistance + " tleft="+targetLeft+" tright="+targetRight);
 
 		// Get the current distance in centimeters
 		currentLeft = Math.abs(leftEncoder.get() - startingLeftDistance);
@@ -227,8 +236,8 @@ public class DriveTrain {
 		// Find the percentage the left and right are to their target
 		leftPercentThere = Math.abs(currentLeft / targetLeft);
 		rightPercentThere = Math.abs(currentRight / targetRight);
-		System.out.println("Percentages At " + leftPercentThere + ", " + rightPercentThere+" CurrentLeft="+currentLeft+" CurrentRight"+currentRight);
-		System.out.println("Leftcm="+currentLeftCentimeters+" Rightcm="+currentRightCentimeters);
+		//System.out.println("Percentages At " + leftPercentThere + ", " + rightPercentThere+" CurrentLeft="+currentLeft+" CurrentRight"+currentRight);
+		//System.out.println("Leftcm="+currentLeftCentimeters+" Rightcm="+currentRightCentimeters);
 
 		// Initially set the powers to their default values
 		leftMotorMultiplier = 1;
@@ -259,7 +268,7 @@ public class DriveTrain {
 				rightMotorMultiplier *= 1 + powerOffset;
 			}
 		}
-		System.out.println("percentages at " + (int)(leftPercentThere * 100) + ", " + (int)(rightPercentThere * 100) + " Power Offset At " + (((int)(1000 * powerOffset)) / 1000.0));
+		//System.out.println("percentages at " + (int)(leftPercentThere * 100) + ", " + (int)(rightPercentThere * 100) + " Power Offset At " + (((int)(1000 * powerOffset)) / 1000.0));
 		// --------------------------------------------------------------------------
 		// -----------------------Flip the powers if
 		// necessary-----------------------
@@ -317,7 +326,7 @@ public class DriveTrain {
 		// (-(int)((getLeftEncoder() - startingLeftDistance) /
 		// Robot.encoderClicksPerCentimeter())));
 
-		System.out.println("Left Power = "+leftMotorMultiplier * power * rampDownPercentage+" Right Power = "+rightMotorMultiplier * power * rampDownPercentage);
+	//	System.out.println("Left Power = "+leftMotorMultiplier * power * rampDownPercentage+" Right Power = "+rightMotorMultiplier * power * rampDownPercentage);
 		leftMotor.set(-rightMotorMultiplier * power * rampDownPercentage);
 		rightMotor.set(leftMotorMultiplier * power * rampDownPercentage);
 
@@ -334,7 +343,7 @@ public class DriveTrain {
 			// are "+ getRightEncoder() + ", " + getLeftEncoder());
 			return true;
 		}
-		System.out.println(" return false here...");
+		//System.out.println(" return false here...");
 
 		return false;
 	}
@@ -347,7 +356,7 @@ public class DriveTrain {
 		setState(DriveTrain.states.AUTO);
 		pidTurn.setDesiredValue(angle);
 		
-		double xVal = pidTurn.calcPID(gyro.getAngle());
+		double xVal = pidTurn.calcPID(navX.getAngle());
 		SmartDashboard.putNumber("X Val", xVal);
 		double leftDrive = SimLib.calcLeftTankDrive(xVal, 0.0);
 		double rightDrive = SimLib.calcRightTankDrive(xVal, 0.0);
@@ -379,7 +388,10 @@ public class DriveTrain {
 	
 	public boolean pidDrive(int position, double multiplier){
 		setState(DriveTrain.states.AUTO);
-		pidDrive.setDesiredValue(position);
+		
+			pidDrive.setDesiredValue(position);
+		
+		
 		double yVal = pidDrive.calcPID((leftEncoder.get()+rightEncoder.get())/2);
 		double leftDrive = SimLib.calcLeftTankDrive(0, yVal);
 		double rightDrive = SimLib.calcRightTankDrive(0,  yVal);
@@ -406,5 +418,19 @@ public class DriveTrain {
 	public void pivotLeftBallForward(){
 		leftMotor.set(0.1);
 		rightMotor.set(-1);
+	}
+	
+	public boolean stopAtContact(double leftMotor, double rightMotor){
+		
+		System.out.println(this.leftEncoder.getRate());
+		if(Math.abs(leftEncoder.getRate()) < 1000){
+			this.leftMotor.set(0);
+			this.rightMotor.set(0);
+			return true;
+		}else{
+			this.leftMotor.set(leftMotor);
+			this.rightMotor.set(rightMotor);
+			return false;
+		}
 	}
 }

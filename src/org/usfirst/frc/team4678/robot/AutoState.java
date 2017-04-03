@@ -16,6 +16,10 @@ public class AutoState {
 	public boolean isGTD = false;
 	public boolean isClaw = false;
 	public boolean isBalling = false;
+	
+	public boolean  isSAC = false;
+
+	boolean sacDone = false;
 	public int leftCentimeters;
 	public int rightCentimeters;
 	public boolean toGoUp = false;
@@ -26,7 +30,8 @@ public class AutoState {
 	public double startingPower = 0.5;
 	public double maxPower = 1;
 	public double endingPower = 0.5;
-	
+	public double sacLeftPower = 0;
+	public double sacRightPower = 0;
 	public AutoState(int driveEncoder, int gyroAngle, GearClaw.states gearState, int minimumIterations, Robot crobot){
 		desiredDriveEncoderVal = driveEncoder;
 		desiredAngle = gyroAngle;
@@ -46,6 +51,14 @@ public class AutoState {
 		}
 	}
 	
+	
+	public AutoState(double leftMotor, double rightMotor,int minIterations,  Robot robot){
+		sacLeftPower = leftMotor;
+		sacRightPower = rightMotor;
+		isSAC = true;
+		this.minIterations = minIterations;
+		this.robot = robot;
+	}
 	public AutoState(int rightCentimeters, int leftCentimeters, Robot crobot){
 		this.leftCentimeters = leftCentimeters;
 		this.rightCentimeters = rightCentimeters;
@@ -133,6 +146,12 @@ public class AutoState {
 			robot.baller.setAutoState(desiredBallAutoState);
 		}
 		
+		if(isSAC){
+			if(robot.driveTrain.stopAtContact(sacLeftPower, sacRightPower)){
+				sacDone = true;
+			}
+		}
+		
 		robot.claw.stateMachine();
 		robot.baller.autoStateMachine();
 	}
@@ -156,6 +175,9 @@ public class AutoState {
 			if(robot.driveTrain.pidDrive.isDone() && iterations > 5){
 				turnDone = true;
 				driveDone = true;
+				System.out.println("Left ENcoder = " + robot.driveTrain.leftEncoder.get());
+
+				System.out.println("Right ENcoder = " + robot.driveTrain.rightEncoder.get());
 			}
 		}
 		
@@ -171,7 +193,9 @@ public class AutoState {
 			isGTDDone = true;
 		}
 		
-		
+		if(!isSAC){
+			sacDone = true;
+		}
 		if(gdist == 1){
 			isGTDDone = true;
 		}
@@ -192,7 +216,7 @@ public class AutoState {
 		if(iterations >= minIterations){
 			iterationsDone = true;
 		}
-		if(driveDone && turnDone && gearDone && iterationsDone && isGTDDone && ballDone){
+		if(driveDone && turnDone && gearDone && iterationsDone && isGTDDone && ballDone && sacDone){
 			return true;
 		}else{
 			return false;
