@@ -129,6 +129,9 @@ public class Robot extends IterativeRobot {
 	public static int autoMode = 0;
 	public static int teleIterations = 0;
 	public static int autoIterations = 0;
+	
+	public static int secondndGearDistance = 0;
+	
 	//public static String hopperState = (baller.)
 	public static AutoState nothing;
 	public static ArrayList<AutoState> nothingList;
@@ -140,6 +143,35 @@ public class Robot extends IterativeRobot {
 	public static AutoState middleGearAutoState4;
 	public static ArrayList<AutoState> middleGearAutoArrayList;
 	public static AutoMode middleGearAuto;
+	
+	public static AutoState middleGearToRightGearAutoState1;
+	public static AutoState middleGearToRightGearAutoState2;
+	public static AutoState middleGearToRightGearAutoState3;
+	public static AutoState middleGearToRightGearAutoState4;
+	public static AutoState middleGearToRightGearAutoState5;
+	public static AutoState middleGearToRightGearAutoState6;
+	public static AutoState middleGearToRightGearAutoState7;
+	public static AutoState middleGearToRightGearAutoState8;
+	public static AutoState middleGearToRightGearAutoState9;
+	public static AutoState middleGearToRightGearAutoState10;
+	public static AutoState middleGearToRightGearAutoState11;
+	public static ArrayList<AutoState> middleGearToRightGearAutoArrayList;
+	public static AutoMode middleGearToRightGearAuto;
+	
+	public static AutoState middleGearToLeftGearAutoState1;
+	public static AutoState middleGearToLeftGearAutoState2;
+	public static AutoState middleGearToLeftGearAutoState3;
+	public static AutoState middleGearToLeftGearAutoState4;
+	public static AutoState middleGearToLeftGearAutoState5;
+	public static AutoState middleGearToLeftGearAutoState6;
+	public static AutoState middleGearToLeftGearAutoState7;
+	public static AutoState middleGearToLeftGearAutoState8;
+	public static AutoState middleGearToLeftGearAutoState9;
+	public static AutoState middleGearToLeftGearAutoState10;
+	public static AutoState middleGearToLeftGearAutoState11;
+	public static ArrayList<AutoState> middleGearToLeftGearAutoArrayList;
+	public static AutoMode middleGearToLeftGearAuto;
+	
 	
 	public static AutoState rightGearAutoState1;
 	public static AutoState rightGearAutoState2;
@@ -229,7 +261,15 @@ public class Robot extends IterativeRobot {
 	public static AutoMode selectedAutoMode;
 	public static String autoName = "Nothing"; 
 	
+	public static boolean pickupBtnHeld = false;
+	public static boolean clampBtnHeld = false;
+	public static TwoGearAuto twoGearAuto;
+	
 	public void autoModeAssemble(){
+		
+		twoGearAuto = new TwoGearAuto();
+		
+		
 		middleGearAutoState1 = new AutoState(0,0,GearClaw.states.LIFT, 30, this);
 		middleGearAutoState2 = new AutoState(-230,-230, 0.75, 15,25,0.5,0.4, GearClaw.states.READYTOSCORE, this);
 		middleGearAutoState3 = new AutoState(0,0,GearClaw.states.SCORE,15, this);
@@ -240,6 +280,56 @@ public class Robot extends IterativeRobot {
 		middleGearAutoArrayList.add(middleGearAutoState3);
 		middleGearAutoArrayList.add(middleGearAutoState4);
 		middleGearAuto = new AutoMode(middleGearAutoArrayList);
+		
+		middleGearToRightGearAutoState1 = middleGearAutoState1;
+		middleGearToRightGearAutoState2 = middleGearAutoState2;
+		middleGearToRightGearAutoState3 = middleGearAutoState3;
+		middleGearToRightGearAutoState4 = middleGearAutoState4;
+		middleGearToRightGearAutoState5 = new AutoState(-180,-180, 0.75, 15,25,0.5,0.4, GearClaw.states.READYTOSCORE, this);
+		middleGearToRightGearAutoState6 = new AutoState(0,90, GearClaw.states.PICKUP, 0, this);
+		middleGearToRightGearAutoState7 = new AutoState(twoGearAuto, this);
+		middleGearToRightGearAutoState8 = new AutoState(0,90, GearClaw.states.READYTOSCORE, 0, this);
+		middleGearToRightGearAutoState9 = new AutoState(180,170, 0.75, 15, 25, 0.5, 0.4, GearClaw.states.READYTOSCORE, this);
+		middleGearToRightGearAutoState10 = new AutoState(0,0,GearClaw.states.SCORE,15, this);
+		middleGearToRightGearAutoState11 = new AutoState(-1500, 0,GearClaw.states.SCORE,0, this);
+		middleGearToRightGearAutoArrayList = new ArrayList<AutoState>();
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState1);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState2);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState3);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState4);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState5);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState6);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState7);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState8);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState9);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState10);
+		middleGearToRightGearAutoArrayList.add(middleGearToRightGearAutoState11);
+		middleGearToRightGearAuto = new AutoMode(middleGearToRightGearAutoArrayList);
+
+		middleGearToLeftGearAutoState1 = middleGearAutoState1;
+		middleGearToLeftGearAutoState2 = middleGearAutoState2;
+		middleGearToLeftGearAutoState3 = middleGearAutoState3;
+		middleGearToLeftGearAutoState4 = middleGearAutoState4;
+		middleGearToLeftGearAutoState5 = new AutoState(-180,-180, 0.75, 15,25,0.5,0.4, GearClaw.states.READYTOSCORE, this);
+		middleGearToLeftGearAutoState6 = new AutoState(0,90, GearClaw.states.PICKUP, 0, this);
+		middleGearToLeftGearAutoState7 = new AutoState(twoGearAuto, this);
+		middleGearToLeftGearAutoState8 = new AutoState(0,90, GearClaw.states.READYTOSCORE, 0, this);
+		middleGearToLeftGearAutoState9 = new AutoState(180,170, 0.75, 15, 25, 0.5, 0.4, GearClaw.states.READYTOSCORE, this);
+		middleGearToLeftGearAutoState10 = new AutoState(0,0,GearClaw.states.SCORE,15, this);
+		middleGearToLeftGearAutoState11 = new AutoState(-1500, 0,GearClaw.states.SCORE,0, this);
+		middleGearToLeftGearAutoArrayList = new ArrayList<AutoState>();
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState1);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState2);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState3);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState4);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState5);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState6);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState7);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState8);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState9);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState10);
+		middleGearToLeftGearAutoArrayList.add(middleGearToLeftGearAutoState11);
+		middleGearToLeftGearAuto = new AutoMode(middleGearToLeftGearAutoArrayList);
 		
 		nothing = new AutoState(0,0, this);
 		nothingList = new ArrayList<AutoState>();
@@ -577,7 +667,7 @@ public class Robot extends IterativeRobot {
 		if (driverGamePad.getRawButton(SHIFT_UP_BTN)) {
 			driveTrain.shiftUp();
 		}
-		if (driverGamePad.getRawButton(PICKUP_BTN) && baller.getCanLowerClawStatus() == true && claw.currentState != GearClaw.states.CLAMP && claw.currentState != GearClaw.states.PICKUP) {
+		if (driverGamePad.getRawButton(PICKUP_BTN) && baller.getCanLowerClawStatus() == true && !pickupBtnHeld) {
 			claw.setState(GearClaw.states.PICKUP);
 		}
 		if (driverGamePad.getRawButton(3)) {
@@ -591,6 +681,8 @@ public class Robot extends IterativeRobot {
 		if (driverGamePad.getRawButton(1)) {
 			claw.setState(GearClaw.states.CLAMP);
 			//resetSensors();
+		}else if(!driverGamePad.getRawButton(1) && clampBtnHeld){
+			claw.setState(GearClaw.states.LIFT);
 		}
 		
 		
@@ -632,7 +724,17 @@ public class Robot extends IterativeRobot {
 			claw.setState(GearClaw.states.READYTOSCORE);
 		}*/
 		
+		if(driverGamePad.getRawButton(PICKUP_BTN)){
+			pickupBtnHeld = true;
+		}else{
+			pickupBtnHeld = false;
+		}
 		
+		if(driverGamePad.getRawButton(1)){
+			clampBtnHeld = true;
+		}else{
+			clampBtnHeld = false;
+		}
 		
 	}
 //	public void operatorBTNpadControls(){

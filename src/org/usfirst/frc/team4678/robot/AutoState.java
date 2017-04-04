@@ -16,7 +16,7 @@ public class AutoState {
 	public boolean isGTD = false;
 	public boolean isClaw = false;
 	public boolean isBalling = false;
-	
+	public boolean isTwoGear = false;
 	public boolean  isSAC = false;
 
 	boolean sacDone = false;
@@ -32,6 +32,9 @@ public class AutoState {
 	public double endingPower = 0.5;
 	public double sacLeftPower = 0;
 	public double sacRightPower = 0;
+	
+	
+	public TwoGearAuto twoGearAuto;
 	public AutoState(int driveEncoder, int gyroAngle, GearClaw.states gearState, int minimumIterations, Robot crobot){
 		desiredDriveEncoderVal = driveEncoder;
 		desiredAngle = gyroAngle;
@@ -51,6 +54,12 @@ public class AutoState {
 		}
 	}
 	
+	public AutoState(TwoGearAuto twoGearAuto, Robot robot){
+		this.twoGearAuto = twoGearAuto;
+		this.robot = robot;
+		isTwoGear = true;
+	}
+	
 	
 	public AutoState(double leftMotor, double rightMotor,int minIterations,  Robot robot){
 		sacLeftPower = leftMotor;
@@ -59,6 +68,7 @@ public class AutoState {
 		this.minIterations = minIterations;
 		this.robot = robot;
 	}
+	
 	public AutoState(int rightCentimeters, int leftCentimeters, Robot crobot){
 		this.leftCentimeters = leftCentimeters;
 		this.rightCentimeters = rightCentimeters;
@@ -152,6 +162,49 @@ public class AutoState {
 			}
 		}
 		
+		if(isTwoGear){
+			if(twoGearAuto.subState == 0){
+				if (gdist == 0) {
+					if(robot.driveTrain.goToDistance(-230, -230, maxPower, rampUpDistance, rampDownDistance, startingPower, endingPower)) { // rightCentimeters, leftCentimeters, power, rampUpDistance,
+						gdist = 1; // end go to Distance when we get true // -260 and -330
+						}	// rampDownDistance, startingPower, endingPower
+					if(robot.claw.currentState == GearClaw.states.CLAMP || robot.claw.currentState == GearClaw.states.PICKUP){
+						gdist = 0;
+						twoGearAuto.subState++;
+
+					}
+				}
+			}else if(twoGearAuto.subState == 1){
+				robot.driveTrain.leftMotor.set(robot.driveTrain.leftMotor.get()/1.035);
+				robot.driveTrain.rightMotor.set(robot.driveTrain.rightMotor.get()/1.035);
+				
+				if(Math.abs(robot.driveTrain.leftMotor.get()) < 0.25){
+					robot.driveTrain.leftMotor.set(0);
+					robot.driveTrain.rightMotor.set(0);
+					twoGearAuto.subState++;
+				}
+			}else if(twoGearAuto.subState == 2){
+				if(robot.driveTrain.leftEncoder.getRate() == 0 && robot.driveTrain.rightEncoder.getRate() == 0){
+					twoGearAuto.returnDistance = (robot.driveTrain.leftEncoder.get() + robot.driveTrain.rightEncoder.get())/60;
+					robot.driveTrain.resetGoToDistanceState();
+					twoGearAuto.subState++;
+				}
+			}else if(twoGearAuto.subState == 3){
+				if (gdist == 0) {
+					if(robot.driveTrain.goToDistance(twoGearAuto.returnDistance, twoGearAuto.returnDistance, maxPower, rampUpDistance, rampDownDistance, startingPower, endingPower)) { // rightCentimeters, leftCentimeters, power, rampUpDistance,
+						gdist = 1; // end go to Distance when we get true // -260 and -330
+						}	// rampDownDistance, startingPower, endingPower
+				}else{
+					twoGearAuto.subState++;
+				}
+			}else if(twoGearAuto.subState == 4){
+				robot.driveTrain.pidTurn(0, 1);
+				if(robot.driveTrain.pidTurn.isDone()){
+					twoGearAuto.subState = 7;
+				}
+			}
+		}
+		
 		robot.claw.stateMachine();
 		robot.baller.autoStateMachine();
 	}
@@ -163,7 +216,15 @@ public class AutoState {
 		boolean iterationsDone = false;
 		boolean isGTDDone = false;
 		boolean ballDone = false;
-		
+		boolean twoGearDone = false;
+				
+		if(isTwoGear){
+			if(twoGearAuto.subState == 7){
+				twoGearDone = true;
+			}
+		}else{
+			twoGearDone = true;
+		}
 		if(isPidTurn){
 			if(robot.driveTrain.pidTurn.isDone() && iterations > 5){
 				turnDone = true;
@@ -216,7 +277,7 @@ public class AutoState {
 		if(iterations >= minIterations){
 			iterationsDone = true;
 		}
-		if(driveDone && turnDone && gearDone && iterationsDone && isGTDDone && ballDone && sacDone){
+		if(driveDone && turnDone && gearDone && iterationsDone && isGTDDone && ballDone && sacDone && twoGearDone){
 			return true;
 		}else{
 			return false;
