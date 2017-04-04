@@ -682,7 +682,7 @@ public class Robot extends IterativeRobot {
 			claw.setState(GearClaw.states.CLAMP);
 			//resetSensors();
 		}else if(!driverGamePad.getRawButton(1) && clampBtnHeld){
-			claw.setState(GearClaw.states.LIFT);
+			claw.toGoUp = true;
 		}
 		
 		
